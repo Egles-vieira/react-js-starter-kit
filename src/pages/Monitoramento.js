@@ -479,114 +479,20 @@ const indicadoresPorUnidade = React.useMemo(() => {
 
   // --- Render principal ---
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Loading Overlay */}
+    <div className="w-full h-screen flex flex-col bg-white overflow-hidden">
+      {/* Loading overlay */}
       {loading && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card border border-border rounded-2xl p-8 shadow-2xl max-w-md w-full mx-4">
-            <div className="text-center space-y-6">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-r from-primary to-primary/70 rounded-full flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-foreground">Carregando sistema</h3>
-                <p className="text-sm text-muted-foreground">Preparando dados de monitoramento...</p>
-              </div>
-              <div className="space-y-2">
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-primary to-primary/70 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">{progress}%</p>
-              </div>
-            </div>
+        <div className="fixed inset-0 z-50 bg-white/90 backdrop-blur-sm flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-lg font-semibold">Carregando... {progress}%</p>
           </div>
         </div>
       )}
 
-      {/* Header com estatísticas */}
-      <div className="bg-gradient-to-r from-card via-card to-card/95 border-b border-border/50 backdrop-blur-sm">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl">
-                <div className="w-6 h-6 bg-gradient-to-r from-primary to-primary/70 rounded-lg"></div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Monitoramento</h1>
-                <p className="text-sm text-muted-foreground">Sistema de rastreamento em tempo real</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-lg font-semibold text-foreground">
-                {new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {new Date().toLocaleTimeString('pt-BR')}
-              </div>
-            </div>
-          </div>
-
-          {/* Cards de estatísticas */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total</p>
-                  <p className="text-2xl font-bold text-foreground">{totals.total}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-success/10 rounded-lg">
-                  <div className="w-4 h-4 bg-success rounded animate-pulse"></div>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Online</p>
-                  <p className="text-2xl font-bold text-success">{totals.online}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-destructive/10 rounded-lg">
-                  <div className="w-4 h-4 bg-destructive rounded animate-pulse"></div>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Offline</p>
-                  <p className="text-2xl font-bold text-destructive">{totals.offline}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-warning/10 rounded-lg">
-                  <div className="w-4 h-4 bg-warning rounded"></div>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Taxa Online</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {totals.total > 0 ? Math.round((totals.online / totals.total) * 100) : 0}%
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Conteúdo principal com layout vertical */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Container do Mapa */}
+      {/* Conteúdo principal ocupando toda a tela */}
+      <div className="h-full flex flex-col overflow-hidden">
+        {/* Container do Mapa ocupando toda largura */}
         <div 
           className="bg-white"
           style={{ 
@@ -643,7 +549,7 @@ const indicadoresPorUnidade = React.useMemo(() => {
           }}
         />
 
-        {/* Container do Grid */}
+        {/* Container do Grid ocupando toda largura */}
         <div 
           className="bg-white flex-1 overflow-hidden"
           style={{ 
@@ -664,8 +570,18 @@ const indicadoresPorUnidade = React.useMemo(() => {
             ativos={ativos}
             setAtivos={setAtivos}
           />
-        </div>
       </div>
+
+      {/* Botão flutuante para configurações */}
+      <button
+        onClick={() => setDrawerOpen(!drawerOpen)}
+        className="fixed top-4 right-4 z-30 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </button>
 
       {/* Painel lateral (drawer) */}
       {drawerOpen && (
