@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://app.roadweb.com.br';
 
@@ -65,6 +70,15 @@ export default function FormularioMotorista({
     setter(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
+    }));
+    setErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const handleCheckboxChange = (name, checked, target = 'form') => {
+    const setter = target === 'form' ? setForm : setVeiculo;
+    setter(prev => ({
+      ...prev,
+      [name]: checked
     }));
     setErrors(prev => ({ ...prev, [name]: '' }));
   };
@@ -147,148 +161,117 @@ export default function FormularioMotorista({
   };
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 20 }}>
+    <div className="p-6 space-y-6">
+      <h2 className="text-2xl font-semibold mb-6">
         {editar ? 'Editar Motorista + Veículo' : 'Novo Motorista + Veículo'}
       </h2>
-      <form onSubmit={handleSubmit} noValidate>
-        <h3>Dados do Motorista</h3>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))',
-          gap: 30
-        }}>
-          {[
-            ['nome', 'Nome*'],
-            ['sobrenome', 'Sobrenome'],
-            ['cpf', 'CPF*'],
-            ['contato', 'Contato'],
-            ['email', 'E-mail'],
-            ['foto_perfil', 'Foto de Perfil (URL)'],
-            ['pais', 'País'],
-            ['estado', 'Estado'],
-            ['cidade', 'Cidade'],
-            ['bairro', 'Bairro'],
-            ['rua', 'Rua'],
-            ['numero', 'Número'],
-            ['cep', 'CEP'],
-            ['unidade', 'Aplicativo'],
-            ['legislacao_id', 'Legislação ID'],
-            ['send_mensagem', 'Recebe Mensagem?'],
-            ['app_liberado', 'App Liberado'],
-            ['status', 'Status']
-          ].map(([key, label]) => (
-            <div key={key}>
-              <label style={{ fontSize: 13, fontWeight: 500, color: '#555' }}>
-                {label}
-              </label>
-              {key === 'send_mensagem' || key === 'app_liberado' ? (
-                <input
-                  type="checkbox"
-                  name={key}
-                  checked={!!form[key]}
-                  onChange={e => handleChange(e, 'form')}
-                  style={{ marginTop: 8 }}
-                />
-              ) : (
-                <input
-                  type="text"
-                  name={key}
-                  value={form[key] ?? ''}
-                  onChange={e => handleChange(e, 'form')}
-                  style={{
-                    width: '100%',
-                    padding: 10,
-                    borderRadius: 6,
-                    border: errors[key] ? '1px solid red' : '1px solid #ccc',
-                    marginTop: 4
-                  }}
-                />
-              )}
-              {errors[key] && (
-                <div style={{ color: 'red', fontSize: 12 }}>
-                  {errors[key]}
+      
+      <form onSubmit={handleSubmit} noValidate className="space-y-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Dados do Motorista</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                ['nome', 'Nome*'],
+                ['sobrenome', 'Sobrenome'],
+                ['cpf', 'CPF*'],
+                ['contato', 'Contato'],
+                ['email', 'E-mail'],
+                ['foto_perfil', 'Foto de Perfil (URL)'],
+                ['pais', 'País'],
+                ['estado', 'Estado'],
+                ['cidade', 'Cidade'],
+                ['bairro', 'Bairro'],
+                ['rua', 'Rua'],
+                ['numero', 'Número'],
+                ['cep', 'CEP'],
+                ['unidade', 'Aplicativo'],
+                ['legislacao_id', 'Legislação ID'],
+                ['status', 'Status']
+              ].map(([key, label]) => (
+                <div key={key} className="space-y-2">
+                  <Label htmlFor={key}>{label}</Label>
+                  <Input
+                    id={key}
+                    name={key}
+                    value={form[key] ?? ''}
+                    onChange={e => handleChange(e, 'form')}
+                    className={errors[key] ? 'border-destructive' : ''}
+                  />
+                  {errors[key] && (
+                    <p className="text-sm text-destructive">{errors[key]}</p>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <h3 style={{ marginTop: 30 }}>Dados do Veículo</h3>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))',
-          gap: 30
-        }}>
-          {[
-            ['placa', 'Placa*'],
-            ['modelo', 'Modelo*'],
-            ['marca', 'Marca'],
-            ['ano', 'Ano*'],
-            ['cor', 'Cor*'],
-            ['renavam', 'Renavam'],
-            ['capacidade', 'Capacidade'],
-            ['tipo', 'Tipo'],
-            ['observacoes', 'Observações']
-          ].map(([key, label]) => (
-            <div key={key}>
-              <label style={{ fontSize: 13, fontWeight: 500, color: '#555' }}>
-                {label}
-              </label>
-              <input
-                type="text"
-                name={key}
-                value={veiculo[key] ?? ''}
-                onChange={e => handleChange(e, 'veiculo')}
-                style={{
-                  width: '100%',
-                  padding: 10,
-                  borderRadius: 6,
-                  border: errors[key] ? '1px solid red' : '1px solid #ccc',
-                  marginTop: 4
-                }}
-              />
-              {errors[key] && (
-                <div style={{ color: 'red', fontSize: 12 }}>
-                  {errors[key]}
+              ))}
+              
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="send_mensagem"
+                    checked={!!form.send_mensagem}
+                    onCheckedChange={(checked) => handleCheckboxChange('send_mensagem', checked, 'form')}
+                  />
+                  <Label htmlFor="send_mensagem">Recebe Mensagem?</Label>
                 </div>
-              )}
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="app_liberado"
+                    checked={!!form.app_liberado}
+                    onCheckedChange={(checked) => handleCheckboxChange('app_liberado', checked, 'form')}
+                  />
+                  <Label htmlFor="app_liberado">App Liberado</Label>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
+          </CardContent>
+        </Card>
 
-        <div style={{ marginTop: 24, textAlign: 'right' }}>
-          <button
-            type="submit"
-            style={{
-              backgroundColor: '#FF612B',
-              color: '#fff',
-              padding: '10px 24px',
-              border: 'none',
-              borderRadius: 6,
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
+        <Card>
+          <CardHeader>
+            <CardTitle>Dados do Veículo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                ['placa', 'Placa*'],
+                ['modelo', 'Modelo*'],
+                ['marca', 'Marca'],
+                ['ano', 'Ano*'],
+                ['cor', 'Cor*'],
+                ['renavam', 'Renavam'],
+                ['capacidade', 'Capacidade'],
+                ['tipo', 'Tipo'],
+                ['observacoes', 'Observações']
+              ].map(([key, label]) => (
+                <div key={key} className="space-y-2">
+                  <Label htmlFor={key}>{label}</Label>
+                  <Input
+                    id={key}
+                    name={key}
+                    value={veiculo[key] ?? ''}
+                    onChange={e => handleChange(e, 'veiculo')}
+                    className={errors[key] ? 'border-destructive' : ''}
+                  />
+                  {errors[key] && (
+                    <p className="text-sm text-destructive">{errors[key]}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end space-x-4">
+          <Button type="submit" className="bg-primary hover:bg-primary/90">
             {editar ? 'Atualizar' : 'Cadastrar'}
-          </button>
+          </Button>
           {editar && (
-            <button
-              type="button"
-              onClick={onCancelar}
-              style={{
-                marginLeft: 12,
-                backgroundColor: '#ccc',
-                color: '#333',
-                padding: '10px 24px',
-                border: 'none',
-                borderRadius: 6,
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-            >
+            <Button type="button" variant="outline" onClick={onCancelar}>
               Cancelar
-            </button>
+            </Button>
           )}
         </div>
       </form>
