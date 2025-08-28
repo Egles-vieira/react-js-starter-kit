@@ -24,7 +24,7 @@ import ListaMotoristas from './pages/ListaMotoristas';
 import ListaNotasFiscais from './pages/ListaNotasFiscais';
 import EmManutencao from './components/EmManutencao';
 import ListaUsuarios from './pages/ListaUsuarios.jsx';
-import Financeiro from './pages/Financeiro';
+import Financeiro from './pages/Financeiro.jsx';
 
 function RotaProtegida({ children }) {
   const token = localStorage.getItem('token');
