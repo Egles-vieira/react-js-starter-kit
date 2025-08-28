@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { FaBatteryFull, FaTachometerAlt, FaHeadphonesAlt, FaRoute, } from 'react-icons/fa';
-import { FiList } from 'react-icons/fi';
+import { FaBatteryFull, FaTachometerAlt, FaHeadphonesAlt, FaRoute } from 'react-icons/fa';
+import { FiList, FiFilter } from 'react-icons/fi';
 
 function formatUTCToBrasilia(isoString) {
   if (!isoString) return '-';
@@ -16,7 +16,6 @@ function formatUTCToBrasilia(isoString) {
   });
 }
 
-
 export default function Grid({
   driversHoje,
   selectedId,
@@ -31,10 +30,10 @@ export default function Grid({
   // Cabeçalhos da tabela
   const headers = useMemo(() => [
     'Ativo', 'Nome', 'Sobrenome', 'CPF', 'Telefone', 'Base', 'Status', 'Offline', 'Risco', 'Rota',
-    'Veículo',  'Lat', 'Lng', ' Bat / Vel', 'Última Atualização'
+    'Veículo', 'Lat', 'Lng', 'Bat / Vel', 'Última Atualização'
   ], []);
 
-// filtros de colunas no grid
+  // Filtros de colunas no grid
   const allColumns = [
     { key: 'ativo', label: 'Ativo' },
     { key: 'nome', label: 'Nome' },
@@ -66,7 +65,7 @@ export default function Grid({
   };
 
   // Larguras padrão e estado de larguras (persistidas no localStorage)
-  const defaultWidths = useMemo(() => [70,70, 70, 100, 100,380, 100, 100, 120, 120, 120, 140, 100, 120, 120], []);
+  const defaultWidths = useMemo(() => [70, 70, 70, 100, 100, 380, 100, 100, 120, 120, 120, 140, 100, 120, 120], []);
   const [colWidths, setColWidths] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('GridColWidths') || '[]');
@@ -75,7 +74,6 @@ export default function Grid({
     return defaultWidths;
   });
   
-  // 2) ref para fechar/posicionar o popover se quiser
   const [mostrarPopover, setMostrarPopover] = useState(false);
   const popoverRef = useRef(null);
 
@@ -182,272 +180,256 @@ export default function Grid({
   });
 
   return (
-    <div style={{ background: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', height: '100%', overflow: 'auto',  }}>
-      <div style={{ padding: '10px 15px' }}>
-        <label style={{ marginRight: 10 }}>Filtrar motoristas:</label>
-        <select value={filtroAtivo} onChange={e => setFiltroAtivo(e.target.value)}
-          style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: 14 }}>
-          <option value="todos">Todos</option>
-          <option value="ativos">Ativos</option>
-          <option value="inativos">Inativos</option>
-        </select>
+    <div className="table-container h-full overflow-auto">
+      {/* Filtros */}
+      <div className="flex items-center gap-4 p-4 bg-muted border-b">
+        <div className="flex items-center gap-2">
+          <FiFilter className="text-muted-foreground" />
+          <label className="text-sm font-medium text-foreground">Filtrar motoristas:</label>
+          <select 
+            value={filtroAtivo} 
+            onChange={e => setFiltroAtivo(e.target.value)}
+            className="px-3 py-1 border border-input rounded-md bg-background text-foreground text-sm focus:ring-2 focus:ring-ring"
+          >
+            <option value="todos">Todos</option>
+            <option value="ativos">Ativos</option>
+            <option value="inativos">Inativos</option>
+          </select>
+        </div>
       </div>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
-        <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
-          <tr style={{ backgroundColor: '#dbddddff', color: '#1F2D3D', fontWeight: 'bold', textTransform: 'uppercase' }}>
-            {/* cabeçalhos visíveis */}
-            {allColumns
-              .filter(col => colunasSelecionadas.includes(col.key))
-              .map((col, i) => (
-                <th
-                  key={col.key}
-                  style={{ padding: '10px 8px', textAlign: 'left', position: 'relative', width: colWidths[i] }}
+      <div className="relative">
+        <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+          <thead className="sticky top-0 z-10">
+            <tr>
+              {/* Cabeçalhos visíveis */}
+              {allColumns
+                .filter(col => colunasSelecionadas.includes(col.key))
+                .map((col, i) => (
+                  <th
+                    key={col.key}
+                    className="table-header-cell border-r border-border last:border-r-0"
+                    style={{ width: colWidths[i] }}
+                  >
+                    {col.label}
+                    <div
+                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/20 z-20"
+                      onMouseDown={e => handleMouseDown(e, i)}
+                    />
+                  </th>
+                ))
+              }
+
+              {/* Botão de colunas */}
+              <th className="table-header-cell w-10 text-center">
+                <button
+                  onClick={() => setMostrarPopover(v => !v)}
+                  className="p-1 hover:bg-accent rounded transition-colors"
+                  title="Configurar colunas"
                 >
-                  {col.label}
-                  <div
-                    style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '5px', cursor: 'col-resize', zIndex: 5 }}
-                    onMouseDown={e => handleMouseDown(e, i)}
-                  />
-                </th>
-              ))
-            }
+                  <FiList size={16} />
+                </button>
+              </th>
+            </tr>
+          </thead>
 
-            {/* botão de colunas */}
-            <th style={{ padding: '10px', textAlign: 'center', width: 40 }}>
-              <button
-                onClick={() => setMostrarPopover(v => !v)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-              >
-                <FiList size={18} />
-              </button>
-            </th>
-          </tr>
-      </thead>
+          <tbody>
+            {driversFiltrados.map((r, i) => {
+              const off = estaOffline(r.localizacao_timestamp);
+              const isSel = r.id_motorista === selectedId;
+              const isLoadingRoute = loadingRoute === r.id_motorista;
+
+              return (
+                <tr
+                  key={r.id_motorista}
+                  className={`table-row border-b border-border ${isSel ? 'selected' : ''}`}
+                >
+                  {allColumns
+                    .filter(col => colunasSelecionadas.includes(col.key))
+                    .map((col, j) => {
+                      const origIdx = allColumns.findIndex(c => c.key === col.key);
+                      const width = colWidths[origIdx];
+
+                      let cellContent;
+                      switch (col.key) {
+                        case 'ativo':
+                          cellContent = (
+                            <input
+                              type="checkbox"
+                              checked={!!r.ativo}
+                              onChange={e => {
+                                e.stopPropagation();
+                                handleToggleAtivo(r.id_motorista, e.target.checked);
+                              }}
+                              className="w-4 h-4 rounded border-border text-primary focus:ring-ring cursor-pointer"
+                            />
+                          );
+                          break;
+
+                        case 'nome':
+                          cellContent = <span className="font-medium">{r.nome}</span>;
+                          break;
+                        case 'sobrenome':
+                          cellContent = r.sobrenome;
+                          break;
+                        case 'cpf':
+                          cellContent = <span className="font-mono text-xs">{r.cpf}</span>;
+                          break;
+                        case 'telefone':
+                          cellContent = <span className="font-mono text-xs">{r.contato}</span>;
+                          break;
+                        case 'unidade':
+                          cellContent = <span className="text-muted-foreground">{r.unidade}</span>;
+                          break;
+
+                        case 'status':
+                          cellContent = (
+                            <span className={`status-badge ${off ? 'status-offline pulse-danger' : 'status-online'}`}>
+                              {off ? 'Offline' : 'Online'}
+                            </span>
+                          );
+                          break;
+
+                        case 'offline':
+                          cellContent = off
+                            ? (() => {
+                                const diff = now - new Date(r.localizacao_timestamp).getTime();
+                                const m = Math.floor(diff / 60000);
+                                const s = Math.floor((diff % 60000) / 1000);
+                                return <span className="font-mono text-xs text-destructive font-medium">{m}m {s}s</span>;
+                              })()
+                            : <span className="text-muted-foreground">—</span>;
+                          break;
+
+                        case 'risco':
+                          const nivel = riscoPorMotorista[r.id_motorista]?.nivel;
+                          cellContent = (
+                            <span className={`status-badge ${
+                              nivel === 'vermelho' ? 'status-danger pulse-danger' :
+                              nivel === 'amarelo' ? 'status-warning pulse-warning' :
+                              'status-normal'
+                            }`}>
+                              {nivel === 'vermelho' ? 'Parado >15min' :
+                               nivel === 'amarelo' ? 'Parado >10min' :
+                               'Normal'}
+                            </span>
+                          );
+                          break;
+
+                        case 'rota':
+                          cellContent = (
+                            <button
+                              onClick={e => {
+                                e.stopPropagation();
+                                handleBuscarRota(r);
+                              }}
+                              disabled={isLoadingRoute}
+                              className={`inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                                isLoadingRoute 
+                                  ? 'bg-muted text-muted-foreground cursor-not-allowed' 
+                                  : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                              }`}
+                            >
+                              <FaRoute size={12} />
+                              {isLoadingRoute ? 'Carregando...' : 'Ver Rota'}
+                            </button>
+                          );
+                          break;
+
+                        case 'veiculo':
+                          cellContent = (
+                            <div className="text-xs">
+                              <div className="font-medium">{r.placa || '-'}</div>
+                              <div className="text-muted-foreground">{r.modelo || '-'} • {r.cor || '-'} • {r.ano || '-'}</div>
+                            </div>
+                          );
+                          break;
+
+                        case 'lat':
+                          cellContent = <span className="font-mono text-xs">{r.latitude || '-'}</span>;
+                          break;
+                        case 'lng':
+                          cellContent = <span className="font-mono text-xs">{r.longitude || '-'}</span>;
+                          break;
+
+                        case 'velbat':
+                          cellContent = (
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1">
+                                <FaTachometerAlt className="text-primary" size={12} />
+                                <span className="text-xs font-mono">{r.velocidade != null ? `${r.velocidade} km/h` : '-'}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <FaBatteryFull 
+                                  className={r.bateria > 50 ? 'text-success' : r.bateria > 20 ? 'text-warning' : 'text-destructive'} 
+                                  size={12} 
+                                />
+                                <span className="text-xs font-mono">{r.bateria != null ? `${r.bateria}%` : '-'}</span>
+                              </div>
+                            </div>
+                          );
+                          break;
+
+                        case 'atualizacao':
+                          cellContent = (
+                            <span className="text-xs font-mono text-muted-foreground">
+                              {r.localizacao_timestamp ? formatUTCToBrasilia(r.localizacao_timestamp) : '-'}
+                            </span>
+                          );
+                          break;
+
+                        default:
+                          cellContent = '-';
+                      }
+
+                      return (
+                        <td
+                          key={col.key}
+                          onClick={() => handleRowClick(r)}
+                          className="table-cell border-r border-border last:border-r-0"
+                          style={{ width }}
+                        >
+                          {cellContent}
+                        </td>
+                      );
+                    })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        {/* Popover de configuração de colunas */}
         {mostrarPopover && (
-        <div
-          ref={popoverRef}
-          style={{
-            position: 'absolute',
-            top: 50,    // ajuste conforme seu layout
-            right: 20,
-            background: '#fff',
-            border: '1px solid #ccc',
-            padding: 8,
-            borderRadius: 6,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            zIndex: 1000
-          }}
-        >
-          {allColumns.map(col => (
-            <label key={col.key} style={{ display: 'block', marginBottom: 4, fontSize: 13 }}>
-              <input
-                type="checkbox"
-                checked={colunasSelecionadas.includes(col.key)}
-                onChange={() => toggleColuna(col.key)}
-                style={{ marginRight: 6 }}
-              />
-              {col.label}
-            </label>
-          ))}
-        </div>
-      )}
-
-       <tbody>
-  {driversFiltrados.map((r, i) => {
-    const off = estaOffline(r.localizacao_timestamp);
-    const isSel = r.id_motorista === selectedId;
-    const isLoadingRoute = loadingRoute === r.id_motorista;
-
-    return (
-      <tr
-        key={r.id_motorista}
-        style={{
-          backgroundColor: isSel ? '#b2ebf2' : i % 2 === 0 ? '#f9f9f9' : '#ffffff',
-          cursor: 'pointer',
-          transition: 'background 0.3s'
-        }}
-        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e0f7fa'}
-        onMouseLeave={e => e.currentTarget.style.backgroundColor = isSel ? '#b2ebf2' : i % 2 === 0 ? '#f9f9f9' : '#ffffff'}
-      >
-        {allColumns
-          .filter(col => colunasSelecionadas.includes(col.key))
-          .map((col, j) => {
-            // para manter o redimensionamento alinhado
-            const origIdx = allColumns.findIndex(c => c.key === col.key);
-            const width = colWidths[origIdx];
-
-            let cellContent;
-            switch (col.key) {
-              case 'ativo':
-                cellContent = (
+          <div
+            ref={popoverRef}
+            className="absolute top-16 right-4 bg-popover border border-border rounded-lg shadow-lg p-3 z-50 min-w-48"
+          >
+            <h3 className="font-medium text-sm mb-2 text-popover-foreground">Configurar Colunas</h3>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {allColumns.map(col => (
+                <label key={col.key} className="flex items-center gap-2 text-sm text-popover-foreground hover:bg-accent/50 p-1 rounded cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={!!r.ativo}
-                    onChange={e => {
-                      e.stopPropagation();
-                      handleToggleAtivo(r.id_motorista, e.target.checked);
-                    }}
-                    style={{ width: 18, height: 18, margin: 0, accentColor: '#FF612B', cursor: 'pointer', transform: 'scale(1.1)' }}
+                    checked={colunasSelecionadas.includes(col.key)}
+                    onChange={() => toggleColuna(col.key)}
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-ring"
                   />
-                );
-                break;
-
-              case 'nome':
-                cellContent = r.nome;
-                break;
-              case 'sobrenome':
-                cellContent = r.sobrenome;
-                break;
-              case 'cpf':
-                cellContent = r.cpf;
-                break;
-              case 'telefone':
-                cellContent = r.contato;
-                break;
-                 case 'unidade':
-                cellContent = r.unidade;
-                break;
-
-              case 'status':
-                cellContent = (
-                  <span
-                    style={{
-                      padding: '4px 10px',
-                      borderRadius: '12px',
-                      color: '#fff',
-                      backgroundColor: off ? '#d32f2f' : '#388e3c',
-                      animation: off ? 'pulse-strong-red 1.2s infinite' : undefined
-                    }}
-                  >
-                    {off ? 'Offline' : 'Online'}
-                  </span>
-                );
-                break;
-
-              case 'offline':
-                cellContent = off
-                  ? (() => {
-                      const diff = now - new Date(r.localizacao_timestamp).getTime();
-                      const m = Math.floor(diff / 60000);
-                      const s = Math.floor((diff % 60000) / 1000);
-                      return `${m}m ${s}s`;
-                    })()
-                  : '—';
-                break;
-
-              case 'risco':
-                const nivel = riscoPorMotorista[r.id_motorista]?.nivel;
-                cellContent = (
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      padding: '4px 16px',
-                      borderRadius: '12px',
-                      textAlign: 'center',
-                      fontWeight: 500,
-                      color:
-                        nivel === 'vermelho'
-                          ? '#fff'
-                          : nivel === 'amarelo'
-                          ? '#000'
-                          : '#555',
-                      backgroundColor:
-                        nivel === 'vermelho'
-                          ? '#d32f2f'
-                          : nivel === 'amarelo'
-                          ? '#ffc107'
-                          : '#e0e0e0',
-                      animation:
-                        nivel === 'vermelho'
-                          ? 'pulse-strong-red 1s infinite'
-                          : nivel === 'amarelo'
-                          ? 'pulse-risk 1.2s infinite'
-                          : undefined
-                    }}
-                  >
-                    {nivel === 'vermelho'
-                      ? 'Parado >15min'
-                      : nivel === 'amarelo'
-                      ? 'Parado >10min'
-                      : 'Normal'}
-                  </span>
-                );
-                break;
-
-              case 'rota':
-                cellContent = (
-                  <button
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleBuscarRota(r);
-                    }}
-                    disabled={isLoadingRoute}
-                    style={{
-                      backgroundColor: isLoadingRoute ? '#cccccc' : '#FF6B35',
-                      color: '#fff',
-                      border: 'none',
-                      padding: '6px 12px',
-                      borderRadius: '8px',
-                      cursor: isLoadingRoute ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontWeight: 'bold',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <FaRoute />
-                    {isLoadingRoute ? '...' : ''}
-                  </button>
-                );
-                break;
-
-              case 'veiculo':
-                cellContent = `${r.placa || '-'} - ${r.modelo || '-'} - ${r.cor || '-'} - ${r.ano || '-'}`;
-                break;
-
-              case 'lat':
-                cellContent = r.latitude || '-';
-                break;
-              case 'lng':
-                cellContent = r.longitude || '-';
-                break;
-
-               case 'velbat':
-                cellContent = `${r.velocidade != null ? r.velocidade + ' km/h' : '-'} / ${r.bateria != null ? r.bateria + '%' : '-'}`;
-                break;
-
-              case 'atualizacao':
-                cellContent = r.localizacao_timestamp
-                  ? formatUTCToBrasilia(r.localizacao_timestamp)
-                  : '-';
-                break;
-
-              default:
-                cellContent = '-';
-            }
-
-            return (
-              <td
-                key={col.key}
-                onClick={() => handleRowClick(r)}
-                style={{ padding: '10px 8px', width }}
+                  {col.label}
+                </label>
+              ))}
+            </div>
+            <div className="mt-3 pt-2 border-t border-border">
+              <button
+                onClick={() => setMostrarPopover(false)}
+                className="w-full px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               >
-                {cellContent}
-              </td>
-            );
-          })}
-      </tr>
-    );
-  })}
-</tbody>
-      </table>
-
-      {/* Animações inline */}
-      <style>
-        {`@keyframes pulse-red {0% {background-color:rgb(231,231,231);}50% {background-color: #ff0000;}100% {background-color:rgb(172,172,172);}}@keyframes pulse-strong-red {0% {background-color:#d32f2f;}50% {background-color:#ff0000;}100% {background-color:#d32f2f;}}@keyframes pulse-risk {0%{background-color:#ffc107;}50%{background-color:#ff8f00;}100%{background-color:#ffc107;}}`}
-      </style>
+                Fechar
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
