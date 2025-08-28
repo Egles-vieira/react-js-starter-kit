@@ -114,6 +114,7 @@ async function carregarFurtos() {
   const [progress, setProgress] = useState(0); // 0..100
 
   const filtroAtivo = localStorage.getItem('filtroAtivo') || 'todos';
+  const [isDragging, setIsDragging] = useState(false);
 
   // Tick para offline/tempo
   useEffect(() => {
@@ -621,13 +622,13 @@ const indicadoresPorUnidade = React.useMemo(() => {
         </div>
 
         {/* Layout dividido */}
-        <div className="flex-1 flex overflow-hidden bg-gradient-to-r from-muted/10 to-muted/5">
+        <div className="flex-1 flex overflow-hidden bg-gradient-to-r from-muted/10 to-muted/5 relative">
           {/* Mapa */}
           <div
-            className="border-r border-border/50 bg-gradient-to-br from-card to-card/80 shadow-inner"
+            className="bg-gradient-to-br from-card to-card/80 shadow-inner overflow-hidden"
             style={{ height: '100%', width: `${mapHeight}%` }}
           >
-            <div className="h-full rounded-lg overflow-hidden border border-border/30 m-2">
+            <div className="h-full m-2 rounded-xl overflow-hidden border border-border/30 shadow-lg">
               <Mapa
                 drivers={driversHoje}
                 selectedId={selectedId}
@@ -650,12 +651,41 @@ const indicadoresPorUnidade = React.useMemo(() => {
             </div>
           </div>
 
+          {/* Divisor redimensionável */}
+          <div
+            className={`w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 hover:bg-gradient-to-b hover:from-primary/40 hover:via-primary/60 hover:to-primary/40 cursor-col-resize flex items-center justify-center group transition-all duration-200 ${isDragging ? 'bg-gradient-to-b from-primary/60 via-primary/80 to-primary/60' : ''}`}
+            onMouseDown={(e) => {
+              setIsDragging(true);
+              const startX = e.clientX;
+              const startWidth = mapHeight;
+              const containerWidth = e.currentTarget.parentElement.offsetWidth;
+
+              const handleMouseMove = (e) => {
+                const deltaX = e.clientX - startX;
+                const deltaPercent = (deltaX / containerWidth) * 100;
+                const newWidth = Math.min(Math.max(startWidth + deltaPercent, 20), 80);
+                setMapHeight(newWidth);
+              };
+
+              const handleMouseUp = () => {
+                setIsDragging(false);
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+              };
+
+              document.addEventListener('mousemove', handleMouseMove);
+              document.addEventListener('mouseup', handleMouseUp);
+            }}
+          >
+            <div className="w-0.5 h-12 bg-white/40 rounded-full group-hover:bg-white/60 group-hover:h-16 transition-all duration-200"></div>
+          </div>
+
           {/* Grid */}
           <div
             className="flex-1 overflow-hidden bg-gradient-to-br from-card to-card/80"
             style={{ width: `${100 - mapHeight}%` }}
           >
-            <div className="h-full m-2">
+            <div className="h-full m-2 rounded-xl overflow-hidden border border-border/30 shadow-lg">
               <Grid
                 driversHoje={driversHoje}
                 selectedId={selectedId}
@@ -669,17 +699,32 @@ const indicadoresPorUnidade = React.useMemo(() => {
               />
             </div>
           </div>
+
+          {/* Botão limpar seleção */}
+          {selectedId && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
+              <button
+                onClick={limparSelecaoMotorista}
+                className="px-6 py-3 bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground rounded-xl hover:from-secondary/90 hover:to-secondary/70 transition-all duration-200 font-medium shadow-lg hover:shadow-xl border border-border/20 backdrop-blur-sm flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Limpar Seleção
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Painel lateral */}
       {drawerOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-fade-in"
           onClick={() => setDrawerOpen(false)}
         >
           <div
-            className="fixed right-0 top-0 h-full w-96 bg-gradient-to-b from-card via-card to-card/95 border-l border-border/50 shadow-2xl z-50 overflow-auto"
+            className="fixed right-0 top-0 h-full w-96 bg-gradient-to-b from-card via-card to-card/95 border-l border-border/50 shadow-2xl z-50 overflow-auto animate-slide-in-right"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 border-b border-border/30">
