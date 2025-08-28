@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LoadScript } from '@react-google-maps/api';
-import './index.css'; // ou './index.css' dependendo do seu projeto
+import './index.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { SidebarProvider } from './contexts/SidebarContext.jsx';
 
 
 import Layout from './components/Layout.jsx';
@@ -32,38 +33,40 @@ function RotaProtegida({ children }) {
 
 export default function App() {
   return (
-   <LoadScript
-      googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
-      libraries={['visualization']}
-    >
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<RotaProtegida><Layout><Dashboard /></Layout></RotaProtegida>} />
-          <Route path="/monitoramento" element={<RotaProtegida><Layout><Monitoramento /></Layout></RotaProtegida>} />
-          <Route path="/cadastro" element={<RotaProtegida><Layout><Cadastro /></Layout></RotaProtegida>} />
-          <Route path="/cadastro/:id" element={<RotaProtegida><Layout><Cadastro /></Layout></RotaProtegida>} />
-          <Route path="/historico" element={<RotaProtegida><Layout><Historico /></Layout></RotaProtegida>} />
-          <Route path="/romaneios" element={<RotaProtegida><Layout><Romaneios /></Layout></RotaProtegida>} />
-          <Route path="/usuarios" element={<RotaProtegida><Layout><ListaUsuarios /></Layout></RotaProtegida>} />
-          <Route path="/monitoradm" element={<RotaProtegida><Layout><Monitoradm /></Layout></RotaProtegida>} />
-          <Route path="/crons" element={<RotaProtegida><Layout><Crons /></Layout></RotaProtegida>} />
-          <Route path="/listaembarcadores" element={<RotaProtegida><Layout><ListaEmbarcadores /></Layout></RotaProtegida>} />
-          <Route path="/listaclientes" element={<RotaProtegida><Layout><ListaClientes /></Layout></RotaProtegida>} />
-          <Route path="/listatransportadoras" element={<RotaProtegida><Layout><ListaTransportadoras /></Layout></RotaProtegida>} />
-          <Route path="/listamotoristas" element={<RotaProtegida><Layout><ListaMotoristas /></Layout></RotaProtegida>} />
-          <Route path="/emmanutencao" element={<RotaProtegida><Layout><EmManutencao /></Layout></RotaProtegida>} />
-          <Route path="/listanotasfiscais" element={<RotaProtegida><Layout><ListaNotasFiscais /></Layout></RotaProtegida>} />
-          <Route path="/financeiro" element={<RotaProtegida><Layout><Financeiro /></Layout></RotaProtegida>} />
-          
-          <Route path="*" element={
-            <RotaProtegida>
-              <Navigate to="/dashboard" replace />
-            </RotaProtegida>
-          } />
-        </Routes>
-        <ToastContainer autoClose={3000} position="top-right" />
-      </BrowserRouter>
-    </LoadScript>
+    <SidebarProvider>
+      <LoadScript
+        googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
+        libraries={['visualization']}
+      >
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<RotaProtegida><Layout><Dashboard /></Layout></RotaProtegida>} />
+            <Route path="/monitoramento" element={<RotaProtegida><Layout><Monitoramento /></Layout></RotaProtegida>} />
+            <Route path="/cadastro" element={<RotaProtegida><Layout><Cadastro /></Layout></RotaProtegida>} />
+            <Route path="/cadastro/:id" element={<RotaProtegida><Layout><Cadastro /></Layout></RotaProtegida>} />
+            <Route path="/historico" element={<RotaProtegida><Layout><Historico /></Layout></RotaProtegida>} />
+            <Route path="/romaneios" element={<RotaProtegida><Layout><Romaneios /></Layout></RotaProtegida>} />
+            <Route path="/usuarios" element={<RotaProtegida><Layout><ListaUsuarios /></Layout></RotaProtegida>} />
+            <Route path="/monitoradm" element={<RotaProtegida><Layout><Monitoradm /></Layout></RotaProtegida>} />
+            <Route path="/crons" element={<RotaProtegida><Layout><Crons /></Layout></RotaProtegida>} />
+            <Route path="/listaembarcadores" element={<RotaProtegida><Layout><ListaEmbarcadores /></Layout></RotaProtegida>} />
+            <Route path="/listaclientes" element={<RotaProtegida><Layout><ListaClientes /></Layout></RotaProtegida>} />
+            <Route path="/listatransportadoras" element={<RotaProtegida><Layout><ListaTransportadoras /></Layout></RotaProtegida>} />
+            <Route path="/listamotoristas" element={<RotaProtegida><Layout><ListaMotoristas /></Layout></RotaProtegida>} />
+            <Route path="/emmanutencao" element={<RotaProtegida><Layout><EmManutencao /></Layout></RotaProtegida>} />
+            <Route path="/listanotasfiscais" element={<RotaProtegida><Layout><ListaNotasFiscais /></Layout></RotaProtegida>} />
+            <Route path="/financeiro" element={<RotaProtegida><Layout><Financeiro /></Layout></RotaProtegida>} />
+            
+            <Route path="*" element={
+              <RotaProtegida>
+                <Navigate to="/dashboard" replace />
+              </RotaProtegida>
+            } />
+          </Routes>
+          <ToastContainer autoClose={3000} position="top-right" />
+        </BrowserRouter>
+      </LoadScript>
+    </SidebarProvider>
   );
 }

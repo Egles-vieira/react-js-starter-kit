@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSidebar } from '../contexts/SidebarContext.jsx';
 import {
   FiUsers,
   FiBarChart2,
@@ -104,12 +105,17 @@ const menuSections = [
 ];
 
 export default function MenuLateral() {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState({});
   const location = useLocation();
-
-  const isMobile = window.innerWidth < 768;
+  const { 
+    collapsed, 
+    setCollapsed, 
+    mobileOpen, 
+    setMobileOpen, 
+    isMobile, 
+    toggleSidebar,
+    sidebarWidth
+  } = useSidebar();
 
   // Auto-open groups that contain the active route
   useEffect(() => {
@@ -262,7 +268,7 @@ export default function MenuLateral() {
       {!isMobile && (
         <button
           className="sidebar-toggle"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={toggleSidebar}
           title={collapsed ? 'Expandir menu' : 'Recolher menu'}
         >
           {collapsed ? <FiChevronRight /> : <FiChevronLeft />}
@@ -273,7 +279,7 @@ export default function MenuLateral() {
       {isMobile && (
         <button
           className="mobile-menu-btn"
-          onClick={() => setMobileOpen(true)}
+          onClick={toggleSidebar}
         >
           <FiMenu />
         </button>
@@ -285,7 +291,7 @@ export default function MenuLateral() {
           top: 0;
           left: 0;
           height: 100vh;
-          width: 280px;
+          width: ${sidebarWidth}px;
           background: linear-gradient(180deg, hsl(var(--sidebar-background)) 0%, hsl(224 71% 6%) 100%);
           border-right: 1px solid hsl(var(--sidebar-border));
           display: flex;
@@ -514,7 +520,7 @@ export default function MenuLateral() {
         .sidebar-toggle {
           position: fixed;
           top: 20px;
-          left: 290px;
+          left: ${sidebarWidth + 10}px;
           width: 32px;
           height: 32px;
           background: hsl(var(--background));

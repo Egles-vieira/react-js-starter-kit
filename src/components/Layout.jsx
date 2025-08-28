@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import { useSidebar } from "../contexts/SidebarContext.jsx";
 import MenuLateral from "./MenuLateral.jsx";
 import Header from "./Header.jsx";
 
@@ -22,6 +23,7 @@ const pageTitles = {
 
 const Layout = ({ children }) => {
   const location = useLocation();
+  const { sidebarWidth, isMobile } = useSidebar();
   const basePath = "/" + location.pathname.split("/")[1];
   const pageTitle = pageTitles[basePath] || "Dashboard";
 
@@ -53,7 +55,7 @@ const Layout = ({ children }) => {
           display: flex;
           flex-direction: column;
           min-width: 0;
-          margin-left: 280px;
+          margin-left: ${isMobile ? 0 : sidebarWidth}px;
           transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
