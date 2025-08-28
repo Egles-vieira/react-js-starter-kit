@@ -1,6 +1,6 @@
 // src/pages/usuarios/ListaUsuarios.js
 import React, { useState, useEffect, useRef } from 'react';
-import FormularioUsuario from './formularios/FormularioUsuario';
+import FormularioUsuario from './formularios/FormularioUsuario.jsx';
 import FormularioAlterarSenha from './formularios/FormularioAlterarSenha';
 import Modal from '../components/Modal';
 import Loader from '../components/Loader';

@@ -7,7 +7,7 @@
 // - Mantém Grid, Mapa, AudiosModal e props já usadas
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import Mapa from '../components/Mapa';
+import Mapa from '../components/Mapa.jsx';
 import Grid from '../components/Grid';
 import AudiosModal from '../components/AudiosModal';
 import io from 'socket.io-client';

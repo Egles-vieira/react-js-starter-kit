@@ -11,11 +11,11 @@ import Layout from './components/Layout.jsx';
 import Cadastro from './pages/Cadastro';
 import Monitoramento from './pages/Monitoramento';
 import Dashboard from './pages/Dashboard';
-import Historico from './pages/Historico';
-import Login from './pages/Login';
+import Historico from './pages/Historico.jsx';
+import Login from './pages/Login.jsx';
 import Romaneios from './pages/ListaRomaneios';
-import Usuarios from './pages/Usuarios';
-import Monitoradm from './pages/Monitoradm';
+import Usuarios from './pages/Usuarios.jsx';
+import Monitoradm from './pages/Monitoradm.jsx';
 import Crons from './pages/Crons';
 import ListaEmbarcadores from './pages/ListaEmbarcadores';
 import ListaClientes from './pages/ListaClientes';
@@ -23,7 +23,7 @@ import ListaTransportadoras from './pages/ListaTransportadoras';
 import ListaMotoristas from './pages/ListaMotoristas';
 import ListaNotasFiscais from './pages/ListaNotasFiscais';
 import EmManutencao from './components/EmManutencao';
-import ListaUsuarios from './pages/ListaUsuarios';
+import ListaUsuarios from './pages/ListaUsuarios.jsx';
 import Financeiro from './pages/Financeiro';
 
 function RotaProtegida({ children }) {

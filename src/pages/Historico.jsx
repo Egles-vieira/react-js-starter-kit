@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import Mapa from '../components/Mapa';
+import Mapa from '../components/Mapa.jsx';
 
 export default function Historico() {
   const [driversInfo, setDriversInfo] = useState([]);
