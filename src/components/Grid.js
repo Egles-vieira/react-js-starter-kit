@@ -180,40 +180,52 @@ export default function Grid({
   });
 
   return (
-    <div className="table-container h-full overflow-auto">
-      {/* Filtros */}
-      <div className="flex items-center gap-4 p-4 bg-muted border-b">
-        <div className="flex items-center gap-2">
-          <FiFilter className="text-muted-foreground" />
-          <label className="text-sm font-medium text-foreground">Filtrar motoristas:</label>
-          <select 
-            value={filtroAtivo} 
-            onChange={e => setFiltroAtivo(e.target.value)}
-            className="px-3 py-1 border border-input rounded-md bg-background text-foreground text-sm focus:ring-2 focus:ring-ring"
-          >
-            <option value="todos">Todos</option>
-            <option value="ativos">Ativos</option>
-            <option value="inativos">Inativos</option>
-          </select>
+    <div className="h-full bg-card rounded-lg border shadow-sm overflow-hidden">
+      {/* Header com filtros */}
+      <div className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border/50 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <FiFilter className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h3 className="text-sm font-semibold text-foreground">Monitoramento de Motoristas</h3>
+              <p className="text-xs text-muted-foreground">{driversFiltrados.length} motoristas encontrados</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium text-foreground">Filtrar:</label>
+            <select 
+              value={filtroAtivo} 
+              onChange={e => setFiltroAtivo(e.target.value)}
+              className="px-3 py-2 border border-input rounded-lg bg-background text-foreground text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 min-w-[120px]"
+            >
+              <option value="todos">Todos</option>
+              <option value="ativos">Ativos</option>
+              <option value="inativos">Inativos</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="relative">
-        <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+      <div className="relative overflow-auto">
+        <table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
           <thead className="sticky top-0 z-10">
-            <tr>
+            <tr className="bg-gradient-to-r from-muted/80 to-muted/60 backdrop-blur-sm">
               {/* Cabeçalhos visíveis */}
               {allColumns
                 .filter(col => colunasSelecionadas.includes(col.key))
                 .map((col, i) => (
                   <th
                     key={col.key}
-                    className="table-header-cell border-r border-border last:border-r-0"
+                    className="relative px-3 py-3 text-left font-semibold text-foreground border-r border-border/30 last:border-r-0 bg-muted/50"
                     style={{ width: colWidths[i] }}
                   >
-                    {col.label}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs uppercase tracking-wide">{col.label}</span>
+                    </div>
                     <div
-                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/20 z-20"
+                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/30 transition-colors duration-200 z-20"
                       onMouseDown={e => handleMouseDown(e, i)}
                     />
                   </th>
@@ -221,13 +233,13 @@ export default function Grid({
               }
 
               {/* Botão de colunas */}
-              <th className="table-header-cell w-10 text-center">
+              <th className="px-3 py-3 text-center bg-muted/50 w-12">
                 <button
                   onClick={() => setMostrarPopover(v => !v)}
-                  className="p-1 hover:bg-accent rounded transition-colors"
+                  className="p-2 hover:bg-accent/80 rounded-lg transition-all duration-200 hover:scale-105"
                   title="Configurar colunas"
                 >
-                  <FiList size={16} />
+                  <FiList className="w-4 h-4 text-muted-foreground" />
                 </button>
               </th>
             </tr>
@@ -242,7 +254,11 @@ export default function Grid({
               return (
                 <tr
                   key={r.id_motorista}
-                  className={`table-row border-b border-border ${isSel ? 'selected' : ''}`}
+                  className={`group cursor-pointer border-b border-border/30 transition-all duration-200 hover:bg-accent/30 ${
+                    isSel 
+                      ? 'bg-primary/10 border-primary/30 shadow-sm' 
+                      : 'hover:shadow-sm'
+                  } ${off ? 'bg-destructive/5' : ''}`}
                 >
                   {allColumns
                     .filter(col => colunasSelecionadas.includes(col.key))
@@ -284,9 +300,16 @@ export default function Grid({
 
                         case 'status':
                           cellContent = (
-                            <span className={`status-badge ${off ? 'status-offline pulse-danger' : 'status-online'}`}>
-                              {off ? 'Offline' : 'Online'}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${off ? 'bg-destructive animate-pulse' : 'bg-success'}`} />
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                off 
+                                  ? 'bg-destructive/10 text-destructive' 
+                                  : 'bg-success/10 text-success'
+                              }`}>
+                                {off ? 'Offline' : 'Online'}
+                              </span>
+                            </div>
                           );
                           break;
 
@@ -301,20 +324,27 @@ export default function Grid({
                             : <span className="text-muted-foreground">—</span>;
                           break;
 
-                        case 'risco':
-                          const nivel = riscoPorMotorista[r.id_motorista]?.nivel;
-                          cellContent = (
-                            <span className={`status-badge ${
-                              nivel === 'vermelho' ? 'status-danger pulse-danger' :
-                              nivel === 'amarelo' ? 'status-warning pulse-warning' :
-                              'status-normal'
-                            }`}>
-                              {nivel === 'vermelho' ? 'Parado >15min' :
-                               nivel === 'amarelo' ? 'Parado >10min' :
-                               'Normal'}
-                            </span>
-                          );
-                          break;
+                         case 'risco':
+                           const nivel = riscoPorMotorista[r.id_motorista]?.nivel;
+                           cellContent = (
+                             <div className="flex items-center gap-2">
+                               <div className={`w-2 h-2 rounded-full ${
+                                 nivel === 'vermelho' ? 'bg-destructive animate-pulse' :
+                                 nivel === 'amarelo' ? 'bg-warning animate-pulse' :
+                                 'bg-success'
+                               }`} />
+                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                 nivel === 'vermelho' ? 'bg-destructive/10 text-destructive' :
+                                 nivel === 'amarelo' ? 'bg-warning/10 text-warning' :
+                                 'bg-success/10 text-success'
+                               }`}>
+                                 {nivel === 'vermelho' ? 'Parado >15min' :
+                                  nivel === 'amarelo' ? 'Parado >10min' :
+                                  'Normal'}
+                               </span>
+                             </div>
+                           );
+                           break;
 
                         case 'rota':
                           cellContent = (
@@ -324,10 +354,10 @@ export default function Grid({
                                 handleBuscarRota(r);
                               }}
                               disabled={isLoadingRoute}
-                              className={`inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                                 isLoadingRoute 
-                                  ? 'bg-muted text-muted-foreground cursor-not-allowed' 
-                                  : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                                  ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-50' 
+                                  : 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 hover:scale-105 shadow-sm hover:shadow-md'
                               }`}
                             >
                               <FaRoute size={12} />
@@ -338,9 +368,14 @@ export default function Grid({
 
                         case 'veiculo':
                           cellContent = (
-                            <div className="text-xs">
-                              <div className="font-medium">{r.placa || '-'}</div>
-                              <div className="text-muted-foreground">{r.modelo || '-'} • {r.cor || '-'} • {r.ano || '-'}</div>
+                            <div className="text-xs space-y-1">
+                              <div className="font-semibold text-foreground bg-muted/30 px-2 py-1 rounded text-center">
+                                {r.placa || '-'}
+                              </div>
+                              <div className="text-muted-foreground text-center">
+                                <div>{r.modelo || '-'}</div>
+                                <div className="text-xs">{r.cor || '-'} • {r.ano || '-'}</div>
+                              </div>
                             </div>
                           );
                           break;
@@ -354,17 +389,21 @@ export default function Grid({
 
                         case 'velbat':
                           cellContent = (
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center gap-1">
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center gap-1 bg-muted/30 px-2 py-1 rounded-lg">
                                 <FaTachometerAlt className="text-primary" size={12} />
-                                <span className="text-xs font-mono">{r.velocidade != null ? `${r.velocidade} km/h` : '-'}</span>
+                                <span className="text-xs font-mono font-medium">
+                                  {r.velocidade != null ? `${r.velocidade} km/h` : '-'}
+                                </span>
                               </div>
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1 bg-muted/30 px-2 py-1 rounded-lg">
                                 <FaBatteryFull 
                                   className={r.bateria > 50 ? 'text-success' : r.bateria > 20 ? 'text-warning' : 'text-destructive'} 
                                   size={12} 
                                 />
-                                <span className="text-xs font-mono">{r.bateria != null ? `${r.bateria}%` : '-'}</span>
+                                <span className="text-xs font-mono font-medium">
+                                  {r.bateria != null ? `${r.bateria}%` : '-'}
+                                </span>
                               </div>
                             </div>
                           );
@@ -386,7 +425,7 @@ export default function Grid({
                         <td
                           key={col.key}
                           onClick={() => handleRowClick(r)}
-                          className="table-cell border-r border-border last:border-r-0"
+                          className="px-3 py-3 border-r border-border/30 last:border-r-0 transition-all duration-200"
                           style={{ width }}
                         >
                           {cellContent}
@@ -403,26 +442,31 @@ export default function Grid({
         {mostrarPopover && (
           <div
             ref={popoverRef}
-            className="absolute top-16 right-4 bg-popover border border-border rounded-lg shadow-lg p-3 z-50 min-w-48"
+            className="absolute top-16 right-4 bg-card border border-border rounded-xl shadow-2xl p-4 z-50 min-w-56 backdrop-blur-sm"
           >
-            <h3 className="font-medium text-sm mb-2 text-popover-foreground">Configurar Colunas</h3>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1.5 bg-primary/10 rounded-lg">
+                <FiList className="w-4 h-4 text-primary" />
+              </div>
+              <h3 className="font-semibold text-sm text-foreground">Configurar Colunas</h3>
+            </div>
+            <div className="space-y-1 max-h-64 overflow-y-auto">
               {allColumns.map(col => (
-                <label key={col.key} className="flex items-center gap-2 text-sm text-popover-foreground hover:bg-accent/50 p-1 rounded cursor-pointer">
+                <label key={col.key} className="flex items-center gap-3 text-sm text-foreground hover:bg-accent/60 p-2 rounded-lg cursor-pointer transition-all duration-200 group">
                   <input
                     type="checkbox"
                     checked={colunasSelecionadas.includes(col.key)}
                     onChange={() => toggleColuna(col.key)}
-                    className="w-4 h-4 rounded border-border text-primary focus:ring-ring"
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 focus:ring-2"
                   />
-                  {col.label}
+                  <span className="group-hover:text-primary transition-colors">{col.label}</span>
                 </label>
               ))}
             </div>
-            <div className="mt-3 pt-2 border-t border-border">
+            <div className="mt-4 pt-3 border-t border-border">
               <button
                 onClick={() => setMostrarPopover(false)}
-                className="w-full px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                className="w-full px-4 py-2 text-sm bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-200 font-medium"
               >
                 Fechar
               </button>
