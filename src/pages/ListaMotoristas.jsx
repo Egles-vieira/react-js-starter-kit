@@ -5,7 +5,11 @@ import Loader from '../components/Loader';
 import FiltroMotoristas from '../components/FiltroMotoristas';
 import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert';
-import { Edit, Trash2, Settings, Search, Filter, Users, Plus, Eye, EyeOff } from 'lucide-react';
+import { 
+  Edit, Trash2, Settings, Search, Filter, Users, Plus, Eye, EyeOff, 
+  Car, Phone, Mail, MapPin, Calendar, User, AlertCircle, CheckCircle,
+  Download, RefreshCw, Grid3X3, List
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +30,8 @@ export default function ListaMotoristas() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('table'); // 'table' ou 'grid'
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const todasColunas = [
     { key: "id_motorista", label: "ID", priority: 3 },
@@ -75,8 +81,13 @@ export default function ListaMotoristas() {
     });
   };
 
-  const carregar = async () => {
-    setLoading(true);
+  const carregar = async (isRefresh = false) => {
+    if (isRefresh) {
+      setIsRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    
     try {
       const response = await fetch(`${API_URL}/api/motoristas`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -88,13 +99,18 @@ export default function ListaMotoristas() {
       
       if (!Array.isArray(data) && data?.error) {
         toast.error(data.error);
+      } else if (isRefresh) {
+        toast.success('Lista atualizada com sucesso!');
       }
     } catch (err) {
       setMotoristas([]);
       toast.error("Erro ao carregar motoristas");
       console.error(err);
     } finally {
-      setTimeout(() => setLoading(false), 300);
+      setTimeout(() => {
+        setLoading(false);
+        setIsRefreshing(false);
+      }, 300);
     }
   };
 
@@ -166,255 +182,430 @@ export default function ListaMotoristas() {
 
   const colunasFiltradas = todasColunas.filter(c => colunasSelecionadas.includes(c.key));
 
-  return (
-    <div className="p-6 max-w-full mx-auto space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Users className="w-6 h-6 text-primary" />
-              <CardTitle className="text-2xl">Lista de Motoristas</CardTitle>
-              <Badge variant="secondary" className="ml-2">
-                {motoristas.length} motoristas
-              </Badge>
+  const renderGridView = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {motoristas.map((m) => (
+        <Card key={m.id_motorista} className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/20">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <User className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold truncate">
+                    {m.nome} {m.sobrenome}
+                  </h3>
+                  <p className="text-sm text-muted-foreground font-mono">
+                    ID: {m.id_motorista}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => editar(m)}
+                  className="h-8 w-8 p-0 hover:bg-primary/10"
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => excluir(m.id_motorista)}
+                  className="h-8 w-8 p-0 hover:bg-destructive/10 text-destructive"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
-            <Button 
-              onClick={() => {
-                setMostrarFormulario(true);
-                setEditando(false);
-                setSelecionado(null);
-              }}
-              className="gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Novo Motorista
-            </Button>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="pt-0">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Buscar por nome, CPF, contato, base ou placa..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+          </CardHeader>
+          
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-mono text-xs">{m.contato || '-'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-xs truncate">{m.email || '-'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-xs">{m.cidade || '-'}</span>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Car className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-mono text-xs font-medium">{m.veiculo?.placa || '-'}</span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {m.veiculo?.modelo || '-'}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {m.veiculo?.cor || '-'} {m.veiculo?.ano || ''}
+                </div>
+              </div>
             </div>
             
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Settings className="w-4 h-4" />
-                  Colunas
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80" align="end">
-                <div className="space-y-4">
-                  <h4 className="font-medium text-sm">Colunas visíveis</h4>
-                  <Separator />
-                  
-                  {/* Grupo por prioridade */}
-                  {[1, 2, 3, 4].map(priority => {
-                    const colunasPrioridade = todasColunas.filter(c => c.priority === priority);
-                    if (colunasPrioridade.length === 0) return null;
-                    
-                    const labels = {
-                      1: "Essenciais",
-                      2: "Importantes", 
-                      3: "Úteis",
-                      4: "Opcionais"
-                    };
-                    
-                    return (
-                      <div key={priority} className="space-y-2">
-                        <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                          {labels[priority]}
-                        </h5>
-                        {colunasPrioridade.map(col => (
-                          <div key={col.key} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={col.key}
-                              checked={colunasSelecionadas.includes(col.key)}
-                              onCheckedChange={() => toggleColuna(col.key)}
-                            />
-                            <label 
-                              htmlFor={col.key} 
-                              className="text-sm cursor-pointer flex-1"
-                            >
-                              {col.label}
-                            </label>
-                          </div>
-                        ))}
-                        {priority < 4 && <Separator />}
-                      </div>
-                    );
-                  })}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Modal */}
-      <Modal open={mostrarFormulario} onClose={() => setMostrarFormulario(false)}>
-        <FormularioMotorista
-          editar={editando}
-          motoristaSelecionado={selecionado}
-          aoSalvar={() => {
-            carregar();
-            setMostrarFormulario(false);
-            setEditando(false);
-            setSelecionado(null);
-          }}
-          aoCancelar={() => setMostrarFormulario(false)}
-        />
-      </Modal>
-
-      {/* Tabela */}
-      <Card>
-        <CardContent className="p-0">
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <Loader />
+            <Separator />
+            
+            <div className="flex items-center justify-between">
+              <Badge variant="outline" className="text-xs">
+                {m.unidade || 'Sem base'}
+              </Badge>
+              
+              <Badge 
+                variant={m.send_mensagem ? "default" : "secondary"} 
+                className="text-xs"
+              >
+                {m.send_mensagem ? (
+                  <>
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Ativo
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    Inativo
+                  </>
+                )}
+              </Badge>
             </div>
-          ) : (
-            <div className="overflow-auto max-h-[70vh] border-t">
-              <table className="w-full border-collapse">
-                <thead className="sticky top-0 z-10 bg-muted/50 backdrop-blur-sm">
-                  <tr className="border-b border-border">
-                    {colunasFiltradas.map(col => (
-                      <th 
-                        key={col.key} 
-                        className="p-3 text-left font-semibold text-muted-foreground uppercase text-xs tracking-wider"
-                      >
-                        {col.label}
-                      </th>
-                    ))}
-                    <th className="p-3 text-center font-semibold text-muted-foreground uppercase text-xs tracking-wider w-24">
-                      Ações
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {motoristas.map((m, i) => (
-                    <tr 
-                      key={m.id_motorista} 
-                      className={cn(
-                        "border-b border-border transition-colors hover:bg-muted/50",
-                        i % 2 === 0 ? "bg-background" : "bg-muted/20"
-                      )}
+            
+            {m.ultima_atualizacao && (
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                {formatarData(m.ultima_atualizacao)}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <Card className="border-2 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+          <CardHeader className="pb-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-primary/10 rounded-xl">
+                  <Users className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                    Lista de Motoristas
+                  </CardTitle>
+                  <p className="text-muted-foreground mt-1">
+                    Gerencie todos os motoristas cadastrados no sistema
+                  </p>
+                </div>
+                <Badge variant="secondary" className="ml-2 px-3 py-1 text-sm">
+                  {motoristas.length} {motoristas.length === 1 ? 'motorista' : 'motoristas'}
+                </Badge>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant="outline"
+                  onClick={() => carregar(true)}
+                  disabled={isRefreshing}
+                  className="gap-2"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  {isRefreshing ? 'Atualizando...' : 'Atualizar'}
+                </Button>
+                
+                <Button 
+                  onClick={() => {
+                    setMostrarFormulario(true);
+                    setEditando(false);
+                    setSelecionado(null);
+                  }}
+                  className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                >
+                  <Plus className="w-4 h-4" />
+                  Novo Motorista
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          
+          <CardContent className="pt-0">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+              <div className="relative flex-1 max-w-lg">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Buscar por nome, CPF, contato, base ou placa..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-11 border-2 focus:border-primary"
+                />
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <div className="flex border rounded-lg p-1 bg-muted/50">
+                  <Button
+                    variant={viewMode === 'table' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('table')}
+                    className="gap-2 h-8"
+                  >
+                    <List className="w-4 h-4" />
+                    Tabela
+                  </Button>
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className="gap-2 h-8"
+                  >
+                    <Grid3X3 className="w-4 h-4" />
+                    Grid
+                  </Button>
+                </div>
+                
+                {viewMode === 'table' && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="gap-2 h-11">
+                        <Settings className="w-4 h-4" />
+                        Colunas
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" align="end">
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-sm">Colunas visíveis</h4>
+                        <Separator />
+                        
+                        {[1, 2, 3, 4].map(priority => {
+                          const colunasPrioridade = todasColunas.filter(c => c.priority === priority);
+                          if (colunasPrioridade.length === 0) return null;
+                          
+                          const labels = {
+                            1: "Essenciais",
+                            2: "Importantes", 
+                            3: "Úteis",
+                            4: "Opcionais"
+                          };
+                          
+                          return (
+                            <div key={priority} className="space-y-2">
+                              <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                {labels[priority]}
+                              </h5>
+                              {colunasPrioridade.map(col => (
+                                <div key={col.key} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={col.key}
+                                    checked={colunasSelecionadas.includes(col.key)}
+                                    onCheckedChange={() => toggleColuna(col.key)}
+                                  />
+                                  <label 
+                                    htmlFor={col.key} 
+                                    className="text-sm cursor-pointer flex-1"
+                                  >
+                                    {col.label}
+                                  </label>
+                                </div>
+                              ))}
+                              {priority < 4 && <Separator />}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Modal */}
+        <Modal open={mostrarFormulario} onClose={() => setMostrarFormulario(false)}>
+          <FormularioMotorista
+            editar={editando}
+            motoristaSelecionado={selecionado}
+            onSalvo={() => {
+              carregar();
+              setMostrarFormulario(false);
+              setEditando(false);
+              setSelecionado(null);
+            }}
+            onCancelar={() => setMostrarFormulario(false)}
+          />
+        </Modal>
+
+        {/* Conteúdo Principal */}
+        <Card className="border-2">
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                <Loader />
+                <p className="text-muted-foreground">Carregando motoristas...</p>
+              </div>
+            ) : motoristas.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                <Users className="w-16 h-16 text-muted-foreground/50" />
+                <div className="text-center space-y-2">
+                  <h3 className="text-lg font-semibold">
+                    {searchTerm ? 'Nenhum motorista encontrado' : 'Nenhum motorista cadastrado'}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {searchTerm 
+                      ? 'Tente ajustar os filtros de busca.' 
+                      : 'Comece cadastrando seu primeiro motorista.'
+                    }
+                  </p>
+                  {searchTerm ? (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setSearchTerm('')}
+                      className="mt-4"
                     >
+                      Limpar filtro
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => {
+                        setMostrarFormulario(true);
+                        setEditando(false);
+                        setSelecionado(null);
+                      }}
+                      className="mt-4 gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Cadastrar Motorista
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : viewMode === 'grid' ? (
+              <div className="p-6">
+                {renderGridView()}
+              </div>
+            ) : (
+              <div className="overflow-auto max-h-[70vh]">
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b-2 border-primary/20">
+                    <tr>
                       {colunasFiltradas.map(col => (
-                        <td key={col.key} className="p-3 text-sm">
-                          {(() => {
-                            const veicCols = ['placa','modelo','marca','ano','cor','renavam','capacidade','tipo','observacoes'];
-                            
-                            if (col.key === 'send_mensagem') {
-                              return (
-                                <Badge variant={m.send_mensagem ? "default" : "secondary"} className="text-xs">
-                                  {m.send_mensagem ? (
-                                    <>
-                                      <Eye className="w-3 h-3 mr-1" />
-                                      Sim
-                                    </>
-                                  ) : (
-                                    <>
-                                      <EyeOff className="w-3 h-3 mr-1" />
-                                      Não
-                                    </>
-                                  )}
-                                </Badge>
-                              );
-                            } else if (col.key === 'ultima_atualizacao') {
-                              return (
-                                <span className="font-mono text-xs text-muted-foreground">
-                                  {formatarData(m.ultima_atualizacao)}
-                                </span>
-                              );
-                            } else if (col.key === 'nome' || col.key === 'sobrenome') {
-                              return <span className="font-medium">{m[col.key] || '-'}</span>;
-                            } else if (col.key === 'cpf' || col.key === 'contato') {
-                              return <span className="font-mono text-xs">{m[col.key] || '-'}</span>;
-                            } else if (col.key === 'unidade') {
-                              return (
-                                <Badge variant="outline" className="text-xs">
-                                  {m[col.key] || '-'}
-                                </Badge>
-                              );
-                            } else if (veicCols.includes(col.key)) {
-                              const valor = m.veiculo?.[col.key];
-                              if (col.key === 'placa') {
+                        <th 
+                          key={col.key} 
+                          className="p-4 text-left font-semibold text-foreground uppercase text-xs tracking-wider bg-muted/50"
+                        >
+                          {col.label}
+                        </th>
+                      ))}
+                      <th className="p-4 text-center font-semibold text-foreground uppercase text-xs tracking-wider w-24 bg-muted/50">
+                        Ações
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {motoristas.map((m, i) => (
+                      <tr 
+                        key={m.id_motorista} 
+                        className={cn(
+                          "border-b border-border transition-all duration-200 hover:bg-primary/5 hover:shadow-sm",
+                          i % 2 === 0 ? "bg-background" : "bg-muted/30"
+                        )}
+                      >
+                        {colunasFiltradas.map(col => (
+                          <td key={col.key} className="p-4 text-sm">
+                            {(() => {
+                              const veicCols = ['placa','modelo','marca','ano','cor','renavam','capacidade','tipo','observacoes'];
+                              
+                              if (col.key === 'send_mensagem') {
                                 return (
-                                  <span className="font-mono text-xs font-medium">
-                                    {valor || '-'}
+                                  <Badge 
+                                    variant={m.send_mensagem ? "default" : "secondary"} 
+                                    className="text-xs gap-1"
+                                  >
+                                    {m.send_mensagem ? (
+                                      <>
+                                        <CheckCircle className="w-3 h-3" />
+                                        Ativo
+                                      </>
+                                    ) : (
+                                      <>
+                                        <AlertCircle className="w-3 h-3" />
+                                        Inativo
+                                      </>
+                                    )}
+                                  </Badge>
+                                );
+                              } else if (col.key === 'ultima_atualizacao') {
+                                return (
+                                  <span className="font-mono text-xs text-muted-foreground">
+                                    {formatarData(m.ultima_atualizacao)}
                                   </span>
                                 );
+                              } else if (col.key === 'nome' || col.key === 'sobrenome') {
+                                return <span className="font-medium">{m[col.key] || '-'}</span>;
+                              } else if (col.key === 'cpf' || col.key === 'contato') {
+                                return <span className="font-mono text-xs">{m[col.key] || '-'}</span>;
+                              } else if (col.key === 'unidade') {
+                                return (
+                                  <Badge variant="outline" className="text-xs">
+                                    {m[col.key] || 'Sem base'}
+                                  </Badge>
+                                );
+                              } else if (veicCols.includes(col.key)) {
+                                const valor = m.veiculo?.[col.key];
+                                if (col.key === 'placa') {
+                                  return (
+                                    <span className="font-mono text-xs font-medium bg-primary/10 px-2 py-1 rounded">
+                                      {valor || '-'}
+                                    </span>
+                                  );
+                                }
+                                return valor || '-';
+                              } else {
+                                return m[col.key] ?? '-';
                               }
-                              return valor || '-';
-                            } else {
-                              return m[col.key] ?? '-';
-                            }
-                          })()}
-                        </td>
-                      ))}
-                      <td className="p-3">
-                        <div className="flex items-center justify-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => editar(m)}
-                            className="h-8 w-8 p-0 hover:bg-primary/10"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => excluir(m.id_motorista)}
-                            className="h-8 w-8 p-0 hover:bg-destructive/10 text-destructive"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {motoristas.length === 0 && (
-                    <tr>
-                      <td 
-                        colSpan={colunasFiltradas.length + 1} 
-                        className="p-8 text-center text-muted-foreground"
-                      >
-                        <div className="flex flex-col items-center gap-2">
-                          <Users className="w-8 h-8 text-muted-foreground/50" />
-                          <span>
-                            {searchTerm ? 'Nenhum motorista encontrado com este filtro.' : 'Nenhum motorista cadastrado.'}
-                          </span>
-                          {searchTerm && (
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => setSearchTerm('')}
-                              className="mt-2"
+                            })()}
+                          </td>
+                        ))}
+                        <td className="p-4">
+                          <div className="flex items-center justify-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => editar(m)}
+                              className="h-9 w-9 p-0 hover:bg-primary/10 hover:text-primary transition-colors"
                             >
-                              Limpar filtro
+                              <Edit className="w-4 h-4" />
                             </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => excluir(m.id_motorista)}
+                              className="h-9 w-9 p-0 hover:bg-destructive/10 text-destructive transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
