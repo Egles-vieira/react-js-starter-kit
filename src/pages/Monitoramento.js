@@ -570,6 +570,7 @@ const indicadoresPorUnidade = React.useMemo(() => {
             ativos={ativos}
             setAtivos={setAtivos}
           />
+        </div>
       </div>
 
       {/* Botão flutuante para configurações */}
