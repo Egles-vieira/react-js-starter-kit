@@ -588,7 +588,7 @@ const indicadoresPorUnidade = React.useMemo(() => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Container do Mapa */}
         <div 
-          className="relative bg-white border-b border-gray-200"
+          className="bg-white"
           style={{ 
             height: `${mapHeight}%`,
             width: '100%',
@@ -645,7 +645,7 @@ const indicadoresPorUnidade = React.useMemo(() => {
 
         {/* Container do Grid */}
         <div 
-          className="relative bg-white flex-1"
+          className="bg-white flex-1 overflow-hidden"
           style={{ 
             height: `${100 - mapHeight}%`,
             width: '100%',

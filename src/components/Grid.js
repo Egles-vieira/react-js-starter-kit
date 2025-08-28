@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Route, Settings, Filter, ChevronDown, Zap, Activity, AlertTriangle, Clock } from 'lucide-react';
 import { FaBatteryFull, FaTachometerAlt, FaHeadphonesAlt, FaRoute } from 'react-icons/fa';
 import { FiList, FiFilter } from 'react-icons/fi';
 
@@ -25,7 +26,9 @@ export default function Grid({
   handleOpenAudiosModal,
   AUDIO_URL,
   now,
-  onRouteRequest
+  onRouteRequest,
+  ativos: propsAtivos,
+  setAtivos: propsSetAtivos
 }) {
   // Cabeçalhos da tabela
   const headers = useMemo(() => [
@@ -131,6 +134,7 @@ export default function Grid({
   }, [driversHoje]);
 
   const [ativos, setAtivos] = useState(() => {
+    if (propsAtivos !== undefined) return propsAtivos;
     try { return JSON.parse(localStorage.getItem('ativos')) || {}; } catch { return {}; }
   });
 
@@ -139,6 +143,9 @@ export default function Grid({
   const handleToggleAtivo = (idMotorista, novoStatus) => {
     const novos = { ...ativos, [idMotorista]: novoStatus };
     setAtivos(novos);
+    if (propsSetAtivos) {
+      propsSetAtivos(novos);
+    }
     localStorage.setItem('ativos', JSON.stringify(novos));
   };
 
@@ -180,52 +187,49 @@ export default function Grid({
   });
 
   return (
-    <div className="h-full bg-white border border-gray-200 overflow-hidden">
-      {/* Header com filtros */}
-      <div className="bg-gray-50 border-b border-gray-200 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FiFilter className="w-4 h-4 text-blue-600" />
+    <div className="h-full overflow-hidden border-0 shadow-lg bg-white">
+      {/* Header with filters */}
+      <div className="p-4 border-b border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <FiFilter className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-900">Filtrar motoristas:</span>
             </div>
-            <div className="flex flex-col gap-1">
-              <h3 className="text-sm font-semibold text-gray-900">Monitoramento de Motoristas</h3>
-              <p className="text-xs text-gray-600">{driversFiltrados.length} motoristas encontrados</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700">Filtrar:</label>
             <select 
               value={filtroAtivo} 
               onChange={e => setFiltroAtivo(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors min-w-[120px]"
+              className="px-3 py-1.5 border border-gray-300 rounded-lg bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors min-w-[120px]"
             >
               <option value="todos">Todos</option>
               <option value="ativos">Ativos</option>
               <option value="inativos">Inativos</option>
             </select>
           </div>
+          
+          <div className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+            {driversFiltrados.length} motoristas
+          </div>
         </div>
       </div>
 
-      <div className="relative overflow-auto">
-        <table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
-          <thead className="sticky top-0 z-10">
-            <tr className="bg-gray-50">
+      {/* Table container */}
+      <div className="overflow-auto h-full">
+        <table className="w-full border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
+          <thead className="sticky top-0 z-10 bg-gray-50">
+            <tr className="border-b border-gray-200">
               {/* Cabeçalhos visíveis */}
               {allColumns
                 .filter(col => colunasSelecionadas.includes(col.key))
                 .map((col, i) => (
                   <th
                     key={col.key}
-                    className="relative px-3 py-3 text-left font-semibold text-gray-900 border-r border-gray-200 last:border-r-0 bg-gray-50"
+                    className="p-3 text-left font-semibold text-gray-900 uppercase text-xs tracking-wider relative bg-gray-50 border-r border-gray-200 last:border-r-0"
                     style={{ width: colWidths[i] }}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs uppercase tracking-wide">{col.label}</span>
-                    </div>
+                    {col.label}
                     <div
-                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-400 transition-colors duration-200 z-20"
+                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-400 transition-colors"
                       onMouseDown={e => handleMouseDown(e, i)}
                     />
                   </th>
@@ -233,14 +237,37 @@ export default function Grid({
               }
 
               {/* Botão de colunas */}
-              <th className="px-3 py-3 text-center bg-gray-50 w-12">
+              <th className="p-3 text-center w-10 bg-gray-50">
                 <button
                   onClick={() => setMostrarPopover(v => !v)}
-                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="h-6 w-6 p-0 hover:bg-gray-200 rounded transition-colors"
                   title="Configurar colunas"
                 >
-                  <FiList className="w-4 h-4 text-gray-600" />
+                  <Settings className="w-4 h-4 text-gray-600 mx-auto" />
                 </button>
+                
+                {/* Popover simples */}
+                {mostrarPopover && (
+                  <div className="absolute right-0 mt-2 w-56 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-sm mb-3 text-gray-900">Colunas visíveis</h4>
+                      {allColumns.map(col => (
+                        <div key={col.key} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={col.key}
+                            checked={colunasSelecionadas.includes(col.key)}
+                            onChange={() => toggleColuna(col.key)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor={col.key} className="text-sm cursor-pointer text-gray-700">
+                            {col.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </th>
             </tr>
           </thead>
@@ -254,11 +281,9 @@ export default function Grid({
               return (
                 <tr
                   key={r.id_motorista}
-                  className={`group cursor-pointer border-b border-gray-100 transition-colors hover:bg-gray-50 ${
-                    isSel 
-                      ? 'bg-blue-50 border-blue-200' 
-                      : ''
-                  } ${off ? 'bg-red-50' : ''}`}
+                  className={`border-b border-gray-100 cursor-pointer transition-colors hover:bg-gray-50 ${
+                    isSel ? 'bg-blue-50 border-blue-200' : ''
+                  } ${off ? 'bg-red-50' : ''} ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
                 >
                   {allColumns
                     .filter(col => colunasSelecionadas.includes(col.key))
@@ -319,32 +344,37 @@ export default function Grid({
                                 const diff = now - new Date(r.localizacao_timestamp).getTime();
                                 const m = Math.floor(diff / 60000);
                                 const s = Math.floor((diff % 60000) / 1000);
-                                return <span className="font-mono text-xs text-red-600 font-medium">{m}m {s}s</span>;
+                                return (
+                                  <span className="text-red-600 font-mono text-xs font-medium flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {m}m {s}s
+                                  </span>
+                                );
                               })()
                             : <span className="text-gray-500">—</span>;
                           break;
 
-                         case 'risco':
-                           const nivel = riscoPorMotorista[r.id_motorista]?.nivel;
-                            cellContent = (
-                              <div className="flex items-center gap-2">
-                                <div className={`w-2 h-2 rounded-full ${
-                                  nivel === 'vermelho' ? 'bg-red-500 animate-pulse' :
-                                  nivel === 'amarelo' ? 'bg-yellow-500 animate-pulse' :
-                                  'bg-green-500'
-                                }`} />
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  nivel === 'vermelho' ? 'bg-red-100 text-red-800' :
-                                  nivel === 'amarelo' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-green-100 text-green-800'
-                                }`}>
-                                  {nivel === 'vermelho' ? 'Parado >15min' :
-                                   nivel === 'amarelo' ? 'Parado >10min' :
-                                   'Normal'}
-                                </span>
-                              </div>
-                            );
-                           break;
+                        case 'risco':
+                          const nivel = riscoPorMotorista[r.id_motorista]?.nivel;
+                          cellContent = (
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${
+                                nivel === 'vermelho' ? 'bg-red-500 animate-pulse' :
+                                nivel === 'amarelo' ? 'bg-yellow-500 animate-pulse' :
+                                'bg-green-500'
+                              }`} />
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                nivel === 'vermelho' ? 'bg-red-100 text-red-800' :
+                                nivel === 'amarelo' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-green-100 text-green-800'
+                              }`}>
+                                {nivel === 'vermelho' ? 'Parado >15min' :
+                                 nivel === 'amarelo' ? 'Parado >10min' :
+                                 'Normal'}
+                              </span>
+                            </div>
+                          );
+                          break;
 
                         case 'rota':
                           cellContent = (
@@ -411,8 +441,10 @@ export default function Grid({
 
                         case 'atualizacao':
                           cellContent = (
-                            <span className="text-xs font-mono text-muted-foreground">
-                              {r.localizacao_timestamp ? formatUTCToBrasilia(r.localizacao_timestamp) : '-'}
+                            <span className="font-mono text-xs text-gray-600">
+                              {r.localizacao_timestamp
+                                ? formatUTCToBrasilia(r.localizacao_timestamp)
+                                : '-'}
                             </span>
                           );
                           break;
@@ -425,7 +457,7 @@ export default function Grid({
                         <td
                           key={col.key}
                           onClick={() => handleRowClick(r)}
-                          className="px-3 py-3 border-r border-border/30 last:border-r-0 transition-all duration-200"
+                          className="p-3 border-r border-gray-100 last:border-r-0"
                           style={{ width }}
                         >
                           {cellContent}
@@ -437,42 +469,6 @@ export default function Grid({
             })}
           </tbody>
         </table>
-
-        {/* Popover de configuração de colunas */}
-        {mostrarPopover && (
-          <div
-            ref={popoverRef}
-            className="absolute top-16 right-4 bg-card border border-border rounded-xl shadow-2xl p-4 z-50 min-w-56 backdrop-blur-sm"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 bg-primary/10 rounded-lg">
-                <FiList className="w-4 h-4 text-primary" />
-              </div>
-              <h3 className="font-semibold text-sm text-foreground">Configurar Colunas</h3>
-            </div>
-            <div className="space-y-1 max-h-64 overflow-y-auto">
-              {allColumns.map(col => (
-                <label key={col.key} className="flex items-center gap-3 text-sm text-foreground hover:bg-accent/60 p-2 rounded-lg cursor-pointer transition-all duration-200 group">
-                  <input
-                    type="checkbox"
-                    checked={colunasSelecionadas.includes(col.key)}
-                    onChange={() => toggleColuna(col.key)}
-                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 focus:ring-2"
-                  />
-                  <span className="group-hover:text-primary transition-colors">{col.label}</span>
-                </label>
-              ))}
-            </div>
-            <div className="mt-4 pt-3 border-t border-border">
-              <button
-                onClick={() => setMostrarPopover(false)}
-                className="w-full px-4 py-2 text-sm bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-200 font-medium"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
