@@ -584,14 +584,14 @@ const indicadoresPorUnidade = React.useMemo(() => {
         </div>
       </div>
 
-      {/* Conteúdo principal com layout dividido */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* Conteúdo principal com layout vertical */}
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Container do Mapa */}
         <div 
-          className="relative bg-white border-r border-gray-200"
+          className="relative bg-white border-b border-gray-200"
           style={{ 
-            height: '100%', 
-            width: `${mapHeight}%`,
+            height: `${mapHeight}%`,
+            width: '100%',
           }}
         >
           <Mapa
@@ -618,19 +618,19 @@ const indicadoresPorUnidade = React.useMemo(() => {
           />
         </div>
 
-        {/* Divisor redimensionável */}
+        {/* Divisor redimensionável horizontal */}
         <div 
-          className="w-1 bg-gray-300 hover:bg-blue-400 cursor-col-resize transition-colors duration-200"
+          className="h-1 bg-gray-300 hover:bg-blue-400 cursor-row-resize transition-colors duration-200"
           onMouseDown={(e) => {
-            const startX = e.clientX;
-            const startWidth = mapHeight;
-            const containerWidth = e.currentTarget.parentElement.offsetWidth;
+            const startY = e.clientY;
+            const startHeight = mapHeight;
+            const containerHeight = e.currentTarget.parentElement.offsetHeight;
 
             const handleMouseMove = (e) => {
-              const deltaX = e.clientX - startX;
-              const deltaPercent = (deltaX / containerWidth) * 100;
-              const newWidth = Math.min(Math.max(startWidth + deltaPercent, 20), 80);
-              setMapHeight(newWidth);
+              const deltaY = e.clientY - startY;
+              const deltaPercent = (deltaY / containerHeight) * 100;
+              const newHeight = Math.min(Math.max(startHeight + deltaPercent, 20), 80);
+              setMapHeight(newHeight);
             };
 
             const handleMouseUp = () => {
@@ -645,10 +645,10 @@ const indicadoresPorUnidade = React.useMemo(() => {
 
         {/* Container do Grid */}
         <div 
-          className="relative bg-white"
+          className="relative bg-white flex-1"
           style={{ 
-            height: '100%', 
-            width: `${100 - mapHeight}%`,
+            height: `${100 - mapHeight}%`,
+            width: '100%',
           }}
         >
           <Grid
