@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-import MenuLateral from './components/MenuLateral';
+import MenuLateral from './components/MenuLateral.jsx';
 import Cadastro from './pages/Cadastro';
 import Monitoramento from './pages/Monitoramento';
 import Dashboard from './pages/Dashboard';
@@ -21,7 +21,7 @@ import ListaClientes from './pages/ListaClientes';
 import ListaTransportadoras from './pages/ListaTransportadoras';
 import ListaMotoristas from './pages/ListaMotoristas';
 import ListaNotasFiscais from './pages/ListaNotasFiscais';
-import Header from './components/Header';
+import Header from './components/Header.jsx';
 import EmManutencao from './components/EmManutencao';
 import ListaUsuarios from './pages/ListaUsuarios';
 import Financeiro from './pages/Financeiro';
