@@ -584,160 +584,104 @@ const indicadoresPorUnidade = React.useMemo(() => {
         </div>
       </div>
 
-      {/* Conteúdo principal */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Controles */}
-        <div className="bg-gradient-to-r from-card to-card/95 border-b border-border/50 p-4">
-          <div className="flex flex-wrap gap-4 items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
-                onClick={() => setDrawerOpen(!drawerOpen)}
-              >
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-                {drawerOpen ? 'Fechar Painel' : 'Configurações'}
-              </button>
-
-              <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-lg border border-border/30">
-                <span className="text-sm font-medium text-foreground">Altura do mapa:</span>
-                <input
-                  type="range"
-                  min="20"
-                  max="80"
-                  value={mapHeight}
-                  onChange={(e) => setMapHeight(Number(e.target.value))}
-                  className="w-32 accent-primary"
-                />
-                <span className="text-sm font-semibold text-primary min-w-[45px]">{mapHeight}%</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 bg-muted/50 px-3 py-2 rounded-lg border border-border/30">
-              <div className={`w-2 h-2 rounded-full ${selectedId ? 'bg-primary animate-pulse' : 'bg-muted-foreground'}`}></div>
-              <span className="text-sm text-muted-foreground">
-                {selectedId ? `Motorista: ${selectedId}` : 'Nenhum selecionado'}
-              </span>
-            </div>
-          </div>
+      {/* Conteúdo principal com layout dividido */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Container do Mapa */}
+        <div 
+          className="relative bg-white border-r border-gray-200"
+          style={{ 
+            height: '100%', 
+            width: `${mapHeight}%`,
+          }}
+        >
+          <Mapa
+            drivers={driversHoje}
+            selectedId={selectedId}
+            routePath={routePath}
+            onSelectMotorista={onSelectMotorista}
+            filtroAtivo={filtroAtivo}
+            heatmapEnabled={heatmapEnabled}
+            heatmapPoints={heatmapPoints}
+            heatmapOptions={{
+              radius: heatRadius,
+              opacity: heatOpacity,
+              maxIntensity: heatMaxIntensity,
+              gradient: {
+                0.2: 'rgba(0, 255, 255, 0)',
+                0.4: 'rgba(0, 255, 255, 1)',
+                0.6: 'rgba(0, 191, 255, 1)',
+                0.8: 'rgba(0, 127, 255, 1)',
+                1.0: 'rgba(0, 63, 255, 1)'
+              }
+            }}
+            mapRef={mapRef}
+          />
         </div>
 
-        {/* Layout dividido */}
-        <div className="flex-1 flex overflow-hidden bg-gradient-to-r from-muted/10 to-muted/5 relative">
-          {/* Mapa */}
-          <div
-            className="bg-gradient-to-br from-card to-card/80 shadow-inner overflow-hidden"
-            style={{ height: '100%', width: `${mapHeight}%` }}
-          >
-            <div className="h-full m-2 rounded-xl overflow-hidden border border-border/30 shadow-lg">
-              <Mapa
-                drivers={driversHoje}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
-                routePath={routePath}
-                onSelectMotorista={onSelectMotorista}
-                estaOffline={estaOffline}
-                mapRef={mapRef}
-                ativos={ativos}
-                setAtivos={setAtivos}
-                filtroAtivo={filtroAtivo}
-                heatmapEnabled={heatmapEnabled}
-                heatmapPoints={heatmapPoints}
-                heatmapOptions={{
-                  radius: heatRadius,
-                  opacity: heatOpacity,
-                  maxIntensity: heatMaxIntensity
-                }}
-              />
-            </div>
-          </div>
+        {/* Divisor redimensionável */}
+        <div 
+          className="w-1 bg-gray-300 hover:bg-blue-400 cursor-col-resize transition-colors duration-200"
+          onMouseDown={(e) => {
+            const startX = e.clientX;
+            const startWidth = mapHeight;
+            const containerWidth = e.currentTarget.parentElement.offsetWidth;
 
-          {/* Divisor redimensionável */}
-          <div
-            className={`w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 hover:bg-gradient-to-b hover:from-primary/40 hover:via-primary/60 hover:to-primary/40 cursor-col-resize flex items-center justify-center group transition-all duration-200 ${isDragging ? 'bg-gradient-to-b from-primary/60 via-primary/80 to-primary/60' : ''}`}
-            onMouseDown={(e) => {
-              setIsDragging(true);
-              const startX = e.clientX;
-              const startWidth = mapHeight;
-              const containerWidth = e.currentTarget.parentElement.offsetWidth;
+            const handleMouseMove = (e) => {
+              const deltaX = e.clientX - startX;
+              const deltaPercent = (deltaX / containerWidth) * 100;
+              const newWidth = Math.min(Math.max(startWidth + deltaPercent, 20), 80);
+              setMapHeight(newWidth);
+            };
 
-              const handleMouseMove = (e) => {
-                const deltaX = e.clientX - startX;
-                const deltaPercent = (deltaX / containerWidth) * 100;
-                const newWidth = Math.min(Math.max(startWidth + deltaPercent, 20), 80);
-                setMapHeight(newWidth);
-              };
+            const handleMouseUp = () => {
+              document.removeEventListener('mousemove', handleMouseMove);
+              document.removeEventListener('mouseup', handleMouseUp);
+            };
 
-              const handleMouseUp = () => {
-                setIsDragging(false);
-                document.removeEventListener('mousemove', handleMouseMove);
-                document.removeEventListener('mouseup', handleMouseUp);
-              };
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+          }}
+        />
 
-              document.addEventListener('mousemove', handleMouseMove);
-              document.addEventListener('mouseup', handleMouseUp);
-            }}
-          >
-            <div className="w-0.5 h-12 bg-white/40 rounded-full group-hover:bg-white/60 group-hover:h-16 transition-all duration-200"></div>
-          </div>
-
-          {/* Grid */}
-          <div
-            className="flex-1 overflow-hidden bg-gradient-to-br from-card to-card/80"
-            style={{ width: `${100 - mapHeight}%` }}
-          >
-            <div className="h-full m-2 rounded-xl overflow-hidden border border-border/30 shadow-lg">
-              <Grid
-                driversHoje={driversHoje}
-                selectedId={selectedId}
-                handleRowClick={handleRowClick}
-                estaOffline={estaOffline}
-                riscoPorMotorista={riscoPorMotorista}
-                handleOpenAudiosModal={handleOpenAudiosModal}
-                AUDIO_URL={AUDIO_URL}
-                now={now}
-                onRouteRequest={handleRouteRequest}
-              />
-            </div>
-          </div>
-
-          {/* Botão limpar seleção */}
-          {selectedId && (
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-              <button
-                onClick={limparSelecaoMotorista}
-                className="px-6 py-3 bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground rounded-xl hover:from-secondary/90 hover:to-secondary/70 transition-all duration-200 font-medium shadow-lg hover:shadow-xl border border-border/20 backdrop-blur-sm flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Limpar Seleção
-              </button>
-            </div>
-          )}
+        {/* Container do Grid */}
+        <div 
+          className="relative bg-white"
+          style={{ 
+            height: '100%', 
+            width: `${100 - mapHeight}%`,
+          }}
+        >
+          <Grid
+            driversHoje={driversHoje}
+            selectedId={selectedId}
+            handleRowClick={handleRowClick}
+            estaOffline={estaOffline}
+            riscoPorMotorista={riscoPorMotorista}
+            handleOpenAudiosModal={handleOpenAudiosModal}
+            AUDIO_URL={AUDIO_URL}
+            now={now}
+            onRouteRequest={handleRouteRequest}
+            ativos={ativos}
+            setAtivos={setAtivos}
+          />
         </div>
       </div>
 
-      {/* Painel lateral */}
+      {/* Painel lateral (drawer) */}
       {drawerOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-fade-in"
-          onClick={() => setDrawerOpen(false)}
-        >
-          <div
-            className="fixed right-0 top-0 h-full w-96 bg-gradient-to-b from-card via-card to-card/95 border-l border-border/50 shadow-2xl z-50 overflow-auto animate-slide-in-right"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 border-b border-border/30">
+        <div className="fixed inset-0 z-40 lg:relative lg:inset-auto">
+          {/* Overlay para mobile */}
+          <div className="lg:hidden fixed inset-0 bg-black/50" onClick={() => setDrawerOpen(false)} />
+          
+          {/* Painel */}
+          <div className="fixed right-0 top-0 h-full w-96 bg-white border-l border-gray-200 shadow-xl lg:relative lg:w-80 lg:shadow-lg overflow-auto">
+            {/* Header do painel */}
+            <div className="bg-gray-50 border-b border-gray-200 p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <div className="w-5 h-5 bg-primary rounded"></div>
-                  </div>
-                  <h2 className="text-xl font-bold text-foreground">Configurações</h2>
-                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Painel de Controle</h3>
                 <button
-                  className="p-2 hover:bg-accent/60 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
                   onClick={() => setDrawerOpen(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

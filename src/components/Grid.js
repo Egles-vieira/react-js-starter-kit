@@ -180,25 +180,25 @@ export default function Grid({
   });
 
   return (
-    <div className="h-full bg-card rounded-lg border shadow-sm overflow-hidden">
+    <div className="h-full bg-white border border-gray-200 overflow-hidden">
       {/* Header com filtros */}
-      <div className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border/50 p-4">
+      <div className="bg-gray-50 border-b border-gray-200 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <FiFilter className="w-4 h-4 text-primary" />
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FiFilter className="w-4 h-4 text-blue-600" />
             </div>
             <div className="flex flex-col gap-1">
-              <h3 className="text-sm font-semibold text-foreground">Monitoramento de Motoristas</h3>
-              <p className="text-xs text-muted-foreground">{driversFiltrados.length} motoristas encontrados</p>
+              <h3 className="text-sm font-semibold text-gray-900">Monitoramento de Motoristas</h3>
+              <p className="text-xs text-gray-600">{driversFiltrados.length} motoristas encontrados</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-foreground">Filtrar:</label>
+            <label className="text-sm font-medium text-gray-700">Filtrar:</label>
             <select 
               value={filtroAtivo} 
               onChange={e => setFiltroAtivo(e.target.value)}
-              className="px-3 py-2 border border-input rounded-lg bg-background text-foreground text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 min-w-[120px]"
+              className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors min-w-[120px]"
             >
               <option value="todos">Todos</option>
               <option value="ativos">Ativos</option>
@@ -211,21 +211,21 @@ export default function Grid({
       <div className="relative overflow-auto">
         <table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
           <thead className="sticky top-0 z-10">
-            <tr className="bg-gradient-to-r from-muted/80 to-muted/60 backdrop-blur-sm">
+            <tr className="bg-gray-50">
               {/* Cabeçalhos visíveis */}
               {allColumns
                 .filter(col => colunasSelecionadas.includes(col.key))
                 .map((col, i) => (
                   <th
                     key={col.key}
-                    className="relative px-3 py-3 text-left font-semibold text-foreground border-r border-border/30 last:border-r-0 bg-muted/50"
+                    className="relative px-3 py-3 text-left font-semibold text-gray-900 border-r border-gray-200 last:border-r-0 bg-gray-50"
                     style={{ width: colWidths[i] }}
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-xs uppercase tracking-wide">{col.label}</span>
                     </div>
                     <div
-                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/30 transition-colors duration-200 z-20"
+                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-400 transition-colors duration-200 z-20"
                       onMouseDown={e => handleMouseDown(e, i)}
                     />
                   </th>
@@ -233,13 +233,13 @@ export default function Grid({
               }
 
               {/* Botão de colunas */}
-              <th className="px-3 py-3 text-center bg-muted/50 w-12">
+              <th className="px-3 py-3 text-center bg-gray-50 w-12">
                 <button
                   onClick={() => setMostrarPopover(v => !v)}
-                  className="p-2 hover:bg-accent/80 rounded-lg transition-all duration-200 hover:scale-105"
+                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                   title="Configurar colunas"
                 >
-                  <FiList className="w-4 h-4 text-muted-foreground" />
+                  <FiList className="w-4 h-4 text-gray-600" />
                 </button>
               </th>
             </tr>
@@ -254,11 +254,11 @@ export default function Grid({
               return (
                 <tr
                   key={r.id_motorista}
-                  className={`group cursor-pointer border-b border-border/30 transition-all duration-200 hover:bg-accent/30 ${
+                  className={`group cursor-pointer border-b border-gray-100 transition-colors hover:bg-gray-50 ${
                     isSel 
-                      ? 'bg-primary/10 border-primary/30 shadow-sm' 
-                      : 'hover:shadow-sm'
-                  } ${off ? 'bg-destructive/5' : ''}`}
+                      ? 'bg-blue-50 border-blue-200' 
+                      : ''
+                  } ${off ? 'bg-red-50' : ''}`}
                 >
                   {allColumns
                     .filter(col => colunasSelecionadas.includes(col.key))
@@ -277,7 +277,7 @@ export default function Grid({
                                 e.stopPropagation();
                                 handleToggleAtivo(r.id_motorista, e.target.checked);
                               }}
-                              className="w-4 h-4 rounded border-border text-primary focus:ring-ring cursor-pointer"
+                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                             />
                           );
                           break;
@@ -295,17 +295,17 @@ export default function Grid({
                           cellContent = <span className="font-mono text-xs">{r.contato}</span>;
                           break;
                         case 'unidade':
-                          cellContent = <span className="text-muted-foreground">{r.unidade}</span>;
+                          cellContent = <span className="text-gray-600">{r.unidade}</span>;
                           break;
 
                         case 'status':
                           cellContent = (
                             <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${off ? 'bg-destructive animate-pulse' : 'bg-success'}`} />
+                              <div className={`w-2 h-2 rounded-full ${off ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`} />
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                 off 
-                                  ? 'bg-destructive/10 text-destructive' 
-                                  : 'bg-success/10 text-success'
+                                  ? 'bg-red-100 text-red-800' 
+                                  : 'bg-green-100 text-green-800'
                               }`}>
                                 {off ? 'Offline' : 'Online'}
                               </span>
@@ -319,31 +319,31 @@ export default function Grid({
                                 const diff = now - new Date(r.localizacao_timestamp).getTime();
                                 const m = Math.floor(diff / 60000);
                                 const s = Math.floor((diff % 60000) / 1000);
-                                return <span className="font-mono text-xs text-destructive font-medium">{m}m {s}s</span>;
+                                return <span className="font-mono text-xs text-red-600 font-medium">{m}m {s}s</span>;
                               })()
-                            : <span className="text-muted-foreground">—</span>;
+                            : <span className="text-gray-500">—</span>;
                           break;
 
                          case 'risco':
                            const nivel = riscoPorMotorista[r.id_motorista]?.nivel;
-                           cellContent = (
-                             <div className="flex items-center gap-2">
-                               <div className={`w-2 h-2 rounded-full ${
-                                 nivel === 'vermelho' ? 'bg-destructive animate-pulse' :
-                                 nivel === 'amarelo' ? 'bg-warning animate-pulse' :
-                                 'bg-success'
-                               }`} />
-                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                 nivel === 'vermelho' ? 'bg-destructive/10 text-destructive' :
-                                 nivel === 'amarelo' ? 'bg-warning/10 text-warning' :
-                                 'bg-success/10 text-success'
-                               }`}>
-                                 {nivel === 'vermelho' ? 'Parado >15min' :
-                                  nivel === 'amarelo' ? 'Parado >10min' :
-                                  'Normal'}
-                               </span>
-                             </div>
-                           );
+                            cellContent = (
+                              <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${
+                                  nivel === 'vermelho' ? 'bg-red-500 animate-pulse' :
+                                  nivel === 'amarelo' ? 'bg-yellow-500 animate-pulse' :
+                                  'bg-green-500'
+                                }`} />
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  nivel === 'vermelho' ? 'bg-red-100 text-red-800' :
+                                  nivel === 'amarelo' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-green-100 text-green-800'
+                                }`}>
+                                  {nivel === 'vermelho' ? 'Parado >15min' :
+                                   nivel === 'amarelo' ? 'Parado >10min' :
+                                   'Normal'}
+                                </span>
+                              </div>
+                            );
                            break;
 
                         case 'rota':
@@ -356,8 +356,8 @@ export default function Grid({
                               disabled={isLoadingRoute}
                               className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                                 isLoadingRoute 
-                                  ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-50' 
-                                  : 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 hover:scale-105 shadow-sm hover:shadow-md'
+                                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50' 
+                                  : 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 shadow-sm hover:shadow-md'
                               }`}
                             >
                               <FaRoute size={12} />
@@ -369,10 +369,10 @@ export default function Grid({
                         case 'veiculo':
                           cellContent = (
                             <div className="text-xs space-y-1">
-                              <div className="font-semibold text-foreground bg-muted/30 px-2 py-1 rounded text-center">
+                              <div className="font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded text-center">
                                 {r.placa || '-'}
                               </div>
-                              <div className="text-muted-foreground text-center">
+                              <div className="text-gray-600 text-center">
                                 <div>{r.modelo || '-'}</div>
                                 <div className="text-xs">{r.cor || '-'} • {r.ano || '-'}</div>
                               </div>
@@ -390,15 +390,15 @@ export default function Grid({
                         case 'velbat':
                           cellContent = (
                             <div className="flex flex-col gap-2">
-                              <div className="flex items-center gap-1 bg-muted/30 px-2 py-1 rounded-lg">
-                                <FaTachometerAlt className="text-primary" size={12} />
+                              <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-lg">
+                                <FaTachometerAlt className="text-blue-600" size={12} />
                                 <span className="text-xs font-mono font-medium">
                                   {r.velocidade != null ? `${r.velocidade} km/h` : '-'}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-1 bg-muted/30 px-2 py-1 rounded-lg">
+                              <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-lg">
                                 <FaBatteryFull 
-                                  className={r.bateria > 50 ? 'text-success' : r.bateria > 20 ? 'text-warning' : 'text-destructive'} 
+                                  className={r.bateria > 50 ? 'text-green-600' : r.bateria > 20 ? 'text-yellow-600' : 'text-red-600'} 
                                   size={12} 
                                 />
                                 <span className="text-xs font-mono font-medium">
