@@ -1,0 +1,18 @@
+/* FormularioMotorista.css */
+.fade-slide-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.fade-slide-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+.fade-slide-exit {
+  opacity: 1;
+}
+.fade-slide-exit-active {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
