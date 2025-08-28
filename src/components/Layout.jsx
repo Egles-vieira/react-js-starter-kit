@@ -34,7 +34,7 @@ const Layout = ({ children }) => {
         <div className="main-wrapper">
           <Header title={pageTitle} />
           <main className="content-area">
-            <div className={`content-inner ${basePath === '/monitoramento' ? 'monitoring' : ''}`}>
+            <div className={`content-inner ${basePath === '/monitoramento' || basePath === '/listamotoristas' ? 'monitoring' : ''}`}>
               {children}
             </div>
           </main>
