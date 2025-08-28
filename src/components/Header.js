@@ -1,182 +1,350 @@
-import React from "react";
+import React, { useState } from "react";
+import { FiSearch, FiPlus, FiBell, FiHelpCircle, FiSettings, FiUser } from "react-icons/fi";
 
 const Header = ({ title }) => {
+  const [searchValue, setSearchValue] = useState("");
+  const [notificationsCount, setNotificationsCount] = useState(3);
+
   return (
     <>
-      <div className="header-superior">
-        {/* Logo */}
+      <header className="modern-header">
+        {/* Left section */}
         <div className="header-left">
-          <div className="logo">
+          <div className="brand-section">
             <img
               src="https://road-guard-audios.sfo3.cdn.digitaloceanspaces.com/image-removebg-preview.png"
-              style={{ width: '40px', height: '40px' }}
-              alt="Logo"
+              className="brand-logo"
+              alt="RoadWise Logo"
             />
-          </div>
-          <div className="header-titles">
-            {/* Agora usa o título dinâmico */}
-            <div className="main-title">{title || "Dashboard"}</div>
-            
+            <div className="brand-info">
+              <h1 className="page-title">{title || "Dashboard"}</h1>
+              <span className="page-subtitle">Sistema de Monitoramento</span>
+            </div>
           </div>
         </div>
 
-        {/* Search */}
-        <div className="header-search">
-          <input type="text" className="search-input" placeholder="Pesquisar..." />
+        {/* Center section - Search */}
+        <div className="header-center">
+          <div className="search-container">
+            <FiSearch className="search-icon" />
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Pesquisar veículos, motoristas..."
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+            {searchValue && (
+              <button 
+                className="clear-search"
+                onClick={() => setSearchValue("")}
+              >
+                ×
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Right icons */}
+        {/* Right section */}
         <div className="header-right">
-          <button className="icon-btn" title="Add">
-            <svg width="20" height="20" viewBox="0 0 20 20">
-              <path d="M10 4v12M4 10h12" stroke="#444" strokeWidth="2" fill="none" strokeLinecap="round" />
-            </svg>
+          <button className="action-btn" title="Adicionar">
+            <FiPlus />
           </button>
-          <button className="icon-btn" title="Notification">
-            <svg width="20" height="20" viewBox="0 0 20 20">
-              <path d="M10 17a2 2 0 0 0 2-2H8a2 2 0 0 0 2 2zm6-3V9a6 6 0 1 0-12 0v5l-1 1v1h16v-1l-1-1z" fill="#444" />
-            </svg>
+          
+          <button className="action-btn notification-btn" title="Notificações">
+            <FiBell />
+            {notificationsCount > 0 && (
+              <span className="notification-badge">{notificationsCount}</span>
+            )}
           </button>
-          <button className="icon-btn" title="Help">
-            <svg width="20" height="20" viewBox="0 0 20 20">
-              <circle cx="10" cy="10" r="9" stroke="#444" strokeWidth="2" fill="none" />
-              <text x="10" y="15" textAnchor="middle" fontSize="12" fill="#444" fontFamily="Arial">?</text>
-            </svg>
+          
+          <button className="action-btn" title="Ajuda">
+            <FiHelpCircle />
           </button>
-          <button className="icon-btn" title="Settings">
-            <svg width="20" height="20" viewBox="0 0 20 20">
-              <circle cx="10" cy="10" r="8" stroke="#444" strokeWidth="2" fill="none" />
-              <circle cx="10" cy="10" r="3" fill="#444" />
-            </svg>
+          
+          <button className="action-btn" title="Configurações">
+            <FiSettings />
           </button>
-          <div className="avatar">
+          
+          <div className="user-profile">
             <img
-              src="https://api.dicebear.com/7.x/bottts/svg?seed=Chat"
-              alt="Avatar"
+              src="https://api.dicebear.com/7.x/bottts/svg?seed=Admin"
+              alt="User Avatar"
+              className="user-avatar"
             />
+            <div className="user-info">
+              <span className="user-name">Administrador</span>
+              <span className="user-role">Admin</span>
+            </div>
           </div>
-          <button className="icon-btn edit-btn" title="Edit">
-            <svg width="18" height="18" viewBox="0 0 20 20">
-              <path d="M2 14.5V18h3.5l10-10-3.5-3.5-10 10zM17.3 6.7a1 1 0 0 0 0-1.4l-2.6-2.6a1 1 0 0 0-1.4 0l-1.4 1.4 4 4 1.4-1.4z" fill="#FF612B" />
-            </svg>
-          </button>
         </div>
-      </div>
+      </header>
+
       <style>{`
-        .header-superior {
-          height: 70px;
-          background: #fff;
+        .modern-header {
+          height: 72px;
+          background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+          backdrop-filter: blur(10px);
+          border-bottom: 1px solid hsl(var(--border));
           display: flex;
           align-items: center;
           justify-content: space-between;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-          padding: 0 32px 0 24px;
-          border-bottom: 2px solid #e5e7eb;
-          position: relative;
-          z-index: 9;
+          padding: 0 24px;
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+
         .header-left {
-          display: flex;
-          align-items: center;
+          flex: 0 0 auto;
         }
-        .logo {
-          margin-right: 20px;
-          margin-left: 20px;
-          width: 38px;
-          height: 38px;
-        }
-        .header-titles {
-          display: flex;
-          flex-direction: column;
-        }
-        .main-title {
-          font-size: 24px;
-          font-weight: 500;
-          color: #222;
-          line-height: 1.2;
-        }
-        .tabs {
-          margin-top: 2px;
-          display: flex;
-        }
-        .tab {
-          font-size: 16px;
-          color: #606060;
-          margin-right: 18px;
-          padding-bottom: 2px;
-          position: relative;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-        }
-        .tab.active {
-          color: #FF612B;
-          font-weight: 500;
-        }
-        .tab.active::after {
-          content: '';
-          display: block;
-          height: 3px;
-          width: 80%;
-          background: #FF612B;
-          border-radius: 2px 2px 0 0;
-          position: absolute;
-          bottom: -4px;
-          left: 10%;
-        }
-        .header-search {
-          flex: 1;
-          display: flex;
-          justify-content: center;
-        }
-        .search-input {
-          width: 320px;
-          padding: 8px 16px;
-          border-radius: 20px;
-          border: 1px solid #e5e7eb;
-          font-size: 15px;
-          outline: none;
-          background: #f7f7f7;
-          transition: border 0.2s;
-        }
-        .search-input:focus {
-          border-color: #FF612B;
-          background: #fff;
-        }
-        .header-right {
+
+        .brand-section {
           display: flex;
           align-items: center;
           gap: 12px;
         }
-        .icon-btn {
+
+        .brand-logo {
+          width: 44px;
+          height: 44px;
+          border-radius: 8px;
+          object-fit: cover;
+        }
+
+        .brand-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .page-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: hsl(var(--foreground));
+          margin: 0;
+          line-height: 1.2;
+        }
+
+        .page-subtitle {
+          font-size: 12px;
+          color: hsl(var(--muted-foreground));
+          margin-top: 2px;
+        }
+
+        .header-center {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .search-container {
+          position: relative;
+          width: 100%;
+          max-width: 400px;
+        }
+
+        .search-input {
+          width: 100%;
+          height: 42px;
+          padding: 0 16px 0 44px;
+          border: 1px solid hsl(var(--border));
+          border-radius: 21px;
+          background: hsl(var(--background));
+          color: hsl(var(--foreground));
+          font-size: 14px;
+          outline: none;
+          transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+          border-color: hsl(var(--primary));
+          box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+        }
+
+        .search-icon {
+          position: absolute;
+          left: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: hsl(var(--muted-foreground));
+          width: 18px;
+          height: 18px;
+        }
+
+        .clear-search {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
           background: none;
           border: none;
+          color: hsl(var(--muted-foreground));
           cursor: pointer;
-          padding: 4px;
+          font-size: 18px;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           border-radius: 50%;
-          transition: background 0.15s;
+          transition: all 0.2s ease;
+        }
+
+        .clear-search:hover {
+          background: hsl(var(--muted));
+          color: hsl(var(--foreground));
+        }
+
+        .header-right {
+          flex: 0 0 auto;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .action-btn {
+          width: 40px;
+          height: 40px;
+          border: none;
+          background: none;
+          color: hsl(var(--muted-foreground));
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          position: relative;
+        }
+
+        .action-btn:hover {
+          background: hsl(var(--muted));
+          color: hsl(var(--foreground));
+        }
+
+        .notification-btn {
+          position: relative;
+        }
+
+        .notification-badge {
+          position: absolute;
+          top: 6px;
+          right: 6px;
+          background: hsl(var(--destructive));
+          color: hsl(var(--destructive-foreground));
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          font-size: 10px;
+          font-weight: 600;
           display: flex;
           align-items: center;
           justify-content: center;
         }
-        .icon-btn:hover {
-          background: #f0f6fa;
-        }
-        .avatar img {
-          width: 38px;
-          height: 38px;
-          border-radius: 50%;
-          border: 2px solid #e5e7eb;
-        }
-        .edit-btn {
+
+        .user-profile {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 12px;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.2s ease;
           margin-left: 8px;
-          background: none;
         }
-        @media (max-width: 900px) {
-          .header-superior { flex-direction: column; height: auto; padding: 8px; }
-          .header-search { margin: 10px 0; }
-          .search-input { width: 90vw; max-width: 320px; }
-          .main-title { font-size: 19px; }
+
+        .user-profile:hover {
+          background: hsl(var(--muted));
+        }
+
+        .user-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: 2px solid hsl(var(--border));
+          object-fit: cover;
+        }
+
+        .user-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .user-name {
+          font-size: 14px;
+          font-weight: 500;
+          color: hsl(var(--foreground));
+          line-height: 1.2;
+        }
+
+        .user-role {
+          font-size: 12px;
+          color: hsl(var(--muted-foreground));
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+          .header-center {
+            max-width: 300px;
+          }
+          
+          .page-subtitle {
+            display: none;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .modern-header {
+            height: 64px;
+            padding: 0 16px;
+          }
+
+          .brand-info {
+            display: none;
+          }
+
+          .header-center {
+            max-width: 200px;
+          }
+
+          .search-input {
+            height: 36px;
+            padding: 0 12px 0 36px;
+            font-size: 13px;
+          }
+
+          .search-icon {
+            left: 12px;
+            width: 16px;
+            height: 16px;
+          }
+
+          .action-btn {
+            width: 36px;
+            height: 36px;
+          }
+
+          .user-info {
+            display: none;
+          }
+
+          .user-profile {
+            padding: 4px;
+            margin-left: 4px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .header-center {
+            display: none;
+          }
+
+          .action-btn:not(.notification-btn) {
+            display: none;
+          }
         }
       `}</style>
     </>

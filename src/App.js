@@ -26,7 +26,9 @@ import EmManutencao from './components/EmManutencao';
 import ListaUsuarios from './pages/ListaUsuarios';
 import Financeiro from './pages/Financeiro';
 
-const SIDEBAR_WIDTH = 80;
+const SIDEBAR_WIDTH_EXPANDED = 280;
+const SIDEBAR_WIDTH_COLLAPSED = 70;
+const HEADER_HEIGHT = 72;
 
 const pageTitles = {
   '/dashboard': 'Dashboard',
@@ -37,10 +39,12 @@ const pageTitles = {
   '/usuarios': 'Usuários',
   '/monitoradm': 'Monitor Adm',
   '/crons': 'Crons',
-  '/listaEmbarcadores': 'Embarcadores',
-  '/listaClientes': 'Clientes',
-  '/listaTransportadoras': 'Transportadoras',
-  '/listaMotoristas': 'Motoristas',
+  '/listaembarcadores': 'Embarcadores',
+  '/listaclientes': 'Clientes',
+  '/listatransportadoras': 'Transportadoras',
+  '/listamotoristas': 'Motoristas',
+  '/listanotasfiscais': 'Notas Fiscais',
+  '/financeiro': 'Financeiro'
 };
 
 function RotaProtegida({ children }) {
@@ -48,59 +52,107 @@ function RotaProtegida({ children }) {
   return token ? children : <Navigate to="/login" replace />
 }
 
-// O LayoutDashboard deve ser recriado para envolver só 1 página por vez:
 function LayoutDashboard({ children }) {
   const location = useLocation();
   const hideSidebar = location.pathname === '/login';
   const basePath = '/' + location.pathname.split('/')[1];
-  const pageTitle = pageTitles[basePath] || '';
+  const pageTitle = pageTitles[basePath] || 'Dashboard';
+
+  if (hideSidebar) {
+    return children;
+  }
 
   return (
-    <>
-      {!hideSidebar && (
-        <div className="sidebar-fixed">
-          <MenuLateral />
-        </div>
-      )}
-      {!hideSidebar && (
-        <div className="header-fixed">
-          <Header title={pageTitle} />
-        </div>
-      )}
-      <main className="main-content">
-        {children}
-      </main>
-      <style>{`
-        .sidebar-fixed {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 85;
-          height: 100vh;
-          background: #102b4e;
-          z-index: 1100;
-        }
-        .header-fixed {
-          position: fixed;
-          top: 0;
-          left: ${SIDEBAR_WIDTH}px;
-          width: calc(100% - ${SIDEBAR_WIDTH}px);
-          z-index: 1000;
-        }
-        .main-content {
-          margin-left: 76px;
-          margin-top: 60px; /* mesma altura do header */
-          min-height: calc(100vh - 60px);
-          background:hsla(0, 0.00%, 91.00%, 0.99);
-          padding: 0px;
-        }
-        @media (max-width: 900px) {
-          .main-content { padding: 5px; }
-        }
-      `}
+    <div className="dashboard-layout">
+      <MenuLateral />
       
-      </style>
-    </>
+      <div className="main-layout">
+        <Header title={pageTitle} />
+        
+        <main className="main-content">
+          <div className="content-container">
+            {children}
+          </div>
+        </main>
+      </div>
+
+      <style>{`
+        .dashboard-layout {
+          display: flex;
+          min-height: 100vh;
+          background: hsl(var(--background));
+        }
+
+        .main-layout {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          margin-left: ${SIDEBAR_WIDTH_EXPANDED}px;
+          transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          min-height: 100vh;
+        }
+
+        .main-content {
+          flex: 1;
+          background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+          overflow-x: hidden;
+          min-height: calc(100vh - ${HEADER_HEIGHT}px);
+        }
+
+        .content-container {
+          padding: 24px;
+          max-width: 1400px;
+          margin: 0 auto;
+          width: 100%;
+          min-height: calc(100vh - ${HEADER_HEIGHT}px - 48px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          .main-layout {
+            margin-left: 0;
+          }
+
+          .content-container {
+            padding: 16px;
+            min-height: calc(100vh - ${HEADER_HEIGHT}px - 32px);
+          }
+        }
+
+        @media (max-width: 480px) {
+          .content-container {
+            padding: 12px;
+          }
+        }
+
+        /* Loading states */
+        .loading-skeleton {
+          background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted-foreground) / 0.1) 50%, hsl(var(--muted)) 75%);
+          background-size: 200% 100%;
+          animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+
+        /* Smooth scrolling */
+        .main-content {
+          scroll-behavior: smooth;
+        }
+
+        /* Focus styles for accessibility */
+        .main-content:focus-visible {
+          outline: 2px solid hsl(var(--primary));
+          outline-offset: 2px;
+        }
+      `}</style>
+    </div>
   );
 }
 

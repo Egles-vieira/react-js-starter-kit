@@ -23,12 +23,5 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       onwarn: () => {},
     }
-  },
-  esbuild: {
-    // Ignore TypeScript errors during build
-    logLevel: 'silent'
-  },
-  define: {
-    "process.env": {}
   }
 }));

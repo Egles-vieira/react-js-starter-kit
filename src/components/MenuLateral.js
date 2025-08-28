@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   FiUsers,
@@ -15,332 +15,586 @@ import {
   FiDollarSign,
   FiClock,
   FiGitPullRequest,
+  FiHome,
+  FiTruck,
+  FiNavigation,
+  FiDatabase,
+  FiActivity,
+  FiX
 } from 'react-icons/fi';
-
-const perfil = localStorage.getItem('perfil');  // ← isso precisa estar aqui
 
 const menuSections = [
   {
-    title: 'Dashboard',
+    title: 'Principal',
     items: [
       {
         name: 'Dashboard',
-        icon: <FiBarChart2 />,
+        icon: <FiHome />,
         to: '/dashboard'
       }
     ]
   },
   {
-    title: 'Operações!',
+    title: 'Operações',
     items: [
       {
-        name: 'Operações',
+        name: 'Monitoramento',
+        icon: <FiActivity />,
+        to: '/monitoramento',
+        description: 'Rastreamento em tempo real'
+      },
+      {
+        name: 'Entregas',
         icon: <FiPackage />,
         children: [
           { name: 'Entregas em geral', to: '/emmanutencao', icon: <FiClipboard /> },
-          { name: 'Notas fiscais',      to: '/listanotasfiscais', icon: <FiDownloadCloud /> },
-          { name: 'Romaneios',         to: '/romaneios',          icon: <FiGitPullRequest /> }
+          { name: 'Notas fiscais', to: '/listanotasfiscais', icon: <FiDownloadCloud /> },
+          { name: 'Romaneios', to: '/romaneios', icon: <FiGitPullRequest /> }
         ]
+      },
+      {
+        name: 'Histórico',
+        icon: <FiClock />,
+        to: '/historico',
+        description: 'Histórico de rotas'
       }
     ]
-    
   },
-    {   
+  {
+    title: 'Financeiro',
     items: [
       {
         name: 'Financeiro',
         icon: <FiDollarSign />,
         to: '/financeiro',
-
+        description: 'Gestão financeira'
       }
     ]
-    
   },
-  
   {
+    title: 'Cadastros',
     items: [
       {
-        name: 'Tempo real',
-        icon: <FiMapPin />,
-        to: '/monitoramento',
+        name: 'Cadastros',
+        icon: <FiDatabase />,
         children: [
-          { name: 'Histórico de rotas', to: '/historico' }
+          { name: 'Embarcadores', to: '/listaembarcadores', icon: <FiUsers /> },
+          { name: 'Clientes', to: '/listaclientes', icon: <FiUsers /> },
+          { name: 'Motoristas', to: '/listamotoristas', icon: <FiTruck /> },
+          { name: 'Veículos', to: '/emmanutencao', icon: <FiNavigation /> },
+          { name: 'Transportadoras', to: '/listatransportadoras', icon: <FiPackage /> },
+          { name: 'Vendedores', to: '/emmanutencao', icon: <FiUsers /> }
         ]
       }
     ]
   },
-
   {
-    title: 'Cadastro',
+    title: 'Sistema',
     items: [
       {
-        name: 'Cadastro',
-        icon: <FiClipboard />,
+        name: 'Configurações',
+        icon: <FiSettings />,
         children: [
-          { name: 'Embarcadores', to: '/listaembarcadores' },
-          { name: 'Clientes', to: '/listaclientes' },
-          { name: 'Motoristas', to: '/Listamotoristas' },
-          { name: 'Veículos', to: '/emmanutencao' },
-          { name: 'Transportadoras', to: '/ListaTransportadoras' },
-          { name: 'Vendedores', to: '/emmanutencao' }
-        ]
-      }
-    ]
-  },
-{
-  title: 'Configurações',
-  items: [
-    {
-      name: 'Configuração',
-      icon: <FiSettings />,
-      children: [
-        { name: 'Usuários sistema', to: '/usuarios' },
-        { name: 'Ações agendadas', to: '/crons' }
-      ]
-    }
-  ]
-},
-  {
-    title: 'Integração',
-    items: [
-      {
-        name: 'Integração',
-        icon: <FiDownloadCloud />,
-        children: [
-          { name: 'APIs', to: '/emmanutencao' },
-          { name: 'Logs', to: '/emmanutencao' }
+          { name: 'Usuários sistema', to: '/usuarios', icon: <FiUsers /> },
+          { name: 'Ações agendadas', to: '/crons', icon: <FiClock /> }
         ]
       }
     ]
   }
-].filter(Boolean);
-
-const logoutItem = {
-  name: 'Sair',
-  icon: <FiLogOut />,
-  to: '/logout'
-};
-
-const fazerLogout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('nome');
-  window.location.href = '/login';
-};
+];
 
 export default function MenuLateral() {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeHover, setActiveHover] = useState(null);
+  const [openGroups, setOpenGroups] = useState({});
   const location = useLocation();
 
   const isMobile = window.innerWidth < 768;
-  const shouldShow = isMobile ? mobileOpen : true;
+
+  // Auto-open groups that contain the active route
+  useEffect(() => {
+    const newOpenGroups = {};
+    menuSections.forEach((section, sectionIndex) => {
+      section.items.forEach((item, itemIndex) => {
+        if (item.children && item.children.some(child => child.to === location.pathname)) {
+          newOpenGroups[`${sectionIndex}-${itemIndex}`] = true;
+        }
+      });
+    });
+    setOpenGroups(newOpenGroups);
+  }, [location.pathname]);
+
+  const toggleGroup = (key) => {
+    if (collapsed) return;
+    setOpenGroups(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const fazerLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('nome');
+    window.location.href = '/login';
+  };
+
+  const isActiveRoute = (to) => location.pathname === to;
+  const hasActiveChild = (children) => children?.some(child => isActiveRoute(child.to));
 
   return (
     <>
+      {/* Mobile Overlay */}
       {isMobile && mobileOpen && (
         <div
+          className="mobile-overlay"
           onClick={() => setMobileOpen(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            zIndex: 998
-          }}
         />
       )}
 
-      {shouldShow && (
-        <aside
-          style={{
-            width: collapsed ? 75 : 240,
-            backgroundColor: '#1F2D3D',
-            color: '#212B36',
-            height: '100vh',
-            transition: 'width 0.3s',
-            position: isMobile ? 'fixed' : 'relative',
-            zIndex: 999,
-            display: 'flex',
-            flexDirection: 'column',
-            borderRight: '1px solid #e0e0e0',
-            top: 0,
-            left: 0
-          }}
-        >
-         
+      {/* Sidebar */}
+      <aside className={`modern-sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
+        {/* Header */}
+        <div className="sidebar-header">
+          {!collapsed && (
+            <div className="brand">
+              <img
+                src="https://road-guard-audios.sfo3.cdn.digitaloceanspaces.com/image-removebg-preview.png"
+                alt="RoadWise"
+                className="brand-icon"
+              />
+              <span className="brand-text">RoadWise</span>
+            </div>
+          )}
+          
+          {isMobile && (
+            <button
+              className="close-btn"
+              onClick={() => setMobileOpen(false)}
+            >
+              <FiX />
+            </button>
+          )}
+        </div>
 
-          <nav style={{ paddingTop: 12, flexGrow: 1 }}>
-            {menuSections.map((section, sIdx) => (
-              <div key={sIdx} style={{ marginBottom: 24 }}>
-                {!collapsed && (
-                  <div
-                    style={{
-                      padding: '2px 10px',
-                      fontSize: 9,
-                      fontWeight: 'bold',
-                      color: '#919EAB',
-                      textTransform: 'uppercase'
-                    }}
-                  >
-                    {section.title}
-                  </div>
-                )}
-                {section.items.map((item, index) => {
-                  const isActive =
-                    location.pathname === item.to ||
-                    (item.children &&
-                      item.children.some((c) => c.to === location.pathname));
-                  const isHovered = activeHover === `${sIdx}-${index}`;
-
-                  return (
-                    <div
-                      key={`${sIdx}-${index}`}
-                      onMouseEnter={() => setActiveHover(`${sIdx}-${index}`)}
-                      onMouseLeave={() => setActiveHover(null)}
-                      style={{ position: 'relative' }}
-                    >
-                      <Link
-                        to={item.to || '#'}
-                        style={{
-                          display: 'flex',
-                          flexDirection: collapsed ? 'column' : 'row',
-                          alignItems: 'center',
-                          gap: 3,
-                          padding: '5px 5px',
-                          color: isActive ? '#FF612B' : '#637381',
-                          textDecoration: 'none',
-                          backgroundColor: isActive ? '#ffffffff' : 'transparent',
-                          fontWeight: isActive ? 'bold' : 'normal',
-                          justifyContent: collapsed ? 'center' : 'flex-start',
-                          position: 'relative',
-                          borderRadius: 3,
-                          transition: 'all 0.3s'
-                        }}
-                      >
-                        <span style={{ fontSize: 25 }}>{item.icon}</span>
-                        <span
-                          style={{
-                            fontSize: 11,
-                            marginTop: collapsed ? 2 : 0,
-                            textAlign: 'center',
-                            display: 'block',
-                            width: '100%'
-                          }}
+        {/* Navigation */}
+        <nav className="sidebar-nav">
+          {menuSections.map((section, sectionIndex) => (
+            <div key={sectionIndex} className="nav-section">
+              {!collapsed && section.title && (
+                <h3 className="section-title">{section.title}</h3>
+              )}
+              
+              {section.items.map((item, itemIndex) => {
+                const key = `${sectionIndex}-${itemIndex}`;
+                const isActive = isActiveRoute(item.to) || hasActiveChild(item.children);
+                const isOpen = openGroups[key];
+                
+                return (
+                  <div key={key} className="nav-item">
+                    {item.children ? (
+                      <>
+                        <button
+                          className={`nav-link group-trigger ${isActive ? 'active' : ''}`}
+                          onClick={() => toggleGroup(key)}
                         >
-                          {item.name}
-                        </span>
-                        {item.children && !collapsed && (
-                          <FiChevronRight style={{ marginLeft: 'auto' }} />
+                          <span className="nav-icon">{item.icon}</span>
+                          {!collapsed && (
+                            <>
+                              <div className="nav-content">
+                                <span className="nav-text">{item.name}</span>
+                                {item.description && (
+                                  <span className="nav-description">{item.description}</span>
+                                )}
+                              </div>
+                              <FiChevronRight className={`chevron ${isOpen ? 'rotated' : ''}`} />
+                            </>
+                          )}
+                        </button>
+                        
+                        {!collapsed && isOpen && (
+                          <div className="submenu">
+                            {item.children.map((child, childIndex) => (
+                              <Link
+                                key={childIndex}
+                                to={child.to}
+                                className={`submenu-link ${isActiveRoute(child.to) ? 'active' : ''}`}
+                              >
+                                {child.icon && <span className="submenu-icon">{child.icon}</span>}
+                                <span className="submenu-text">{child.name}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <Link
+                        to={item.to}
+                        className={`nav-link ${isActive ? 'active' : ''}`}
+                      >
+                        <span className="nav-icon">{item.icon}</span>
+                        {!collapsed && (
+                          <div className="nav-content">
+                            <span className="nav-text">{item.name}</span>
+                            {item.description && (
+                              <span className="nav-description">{item.description}</span>
+                            )}
+                          </div>
                         )}
                       </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
 
-                      {item.children && isHovered && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            left: '100%',
-                            top: 0,
-                            background: '#fff',
-                            padding: 8,
-                            borderRadius: 8,
-                            zIndex: 1000,
-                            minWidth: 230,
-                            boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
-                          }}
-                        >
-                          {item.children.map((child, idx) => (
-                            <Link
-                              key={idx}
-                              to={child.to}
-                              style={{
-                                display: 'block',
-                                color: '#212b36',
-                                padding: '8px 12px',
-                                textDecoration: 'none',
-                                borderRadius: 4,
-                                fontSize: 13,
-                                backgroundColor:
-                                  location.pathname === child.to
-                                    ? '#f1f1f1'
-                                    : 'transparent'
-                              }}
-                          >
-                              {/* Renderiza o ícone, se existir */}
-                              {child.icon && (
-                                <span style={{ fontSize: 16, padding: 8,  }}>
-                                  {child.icon}
-                                </span>
-                              )}
-                              <span>{child.name}</span>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </nav>
+        {/* Footer */}
+        <div className="sidebar-footer">
+          <button
+            className="nav-link logout-btn"
+            onClick={fazerLogout}
+          >
+            <span className="nav-icon"><FiLogOut /></span>
+            {!collapsed && <span className="nav-text">Sair</span>}
+          </button>
+        </div>
+      </aside>
 
-          <div style={{ paddingBottom: 16 }}>
-            <Link
-              to="#"
-              onClick={fazerLogout}
-              style={{
-                display: 'flex',
-                flexDirection: collapsed ? 'column' : 'row',
-                alignItems: 'center',
-                gap: 10,
-                padding: '12px 16px',
-                color:
-                  location.pathname === logoutItem.to ? '#FF612B' : '#637381',
-                backgroundColor:
-                  location.pathname === logoutItem.to ? '#e8f5e9' : 'transparent',
-                textDecoration: 'none',
-                justifyContent: collapsed ? 'center' : 'flex-start',
-                borderRadius: 8
-              }}
-            >
-              <span style={{ fontSize: 20 }}>{logoutItem.icon}</span>
-              <span
-                style={{
-                  fontSize: 13,
-                  marginTop: collapsed ? 4 : 0,
-                  textAlign: 'center',
-                  display: 'block',
-                  width: '100%'
-                }}
-              >
-                {logoutItem.name}
-              </span>
-            </Link>
-          </div>
-        </aside>
+      {/* Toggle Button */}
+      {!isMobile && (
+        <button
+          className="sidebar-toggle"
+          onClick={() => setCollapsed(!collapsed)}
+          title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+        >
+          {collapsed ? <FiChevronRight /> : <FiChevronLeft />}
+        </button>
       )}
 
-      {/* Botão de toggle (desktop ou mobile) */}
-      <button
-        onClick={() => (isMobile ? setMobileOpen(!mobileOpen) : setCollapsed(!collapsed))}
-        style={{
-          background: '#fff',
-          color: '#FF612B',
-          border: '1px solid #e0e0e0',
-          height: 50,
-          width: 30,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'fixed',
-          top: 16,
-          left: shouldShow ? (collapsed ? 75 : 240) : 10,
-          borderRadius: 4,
-          cursor: 'pointer',
-          zIndex: 1000
-        }}
-      >
-        {isMobile ? <FiMenu /> : collapsed ? <FiChevronRight /> : <FiChevronLeft />}
-      </button>
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setMobileOpen(true)}
+        >
+          <FiMenu />
+        </button>
+      )}
+
+      <style>{`
+        .modern-sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100vh;
+          width: 280px;
+          background: linear-gradient(180deg, hsl(var(--sidebar-background)) 0%, hsl(224 71% 6%) 100%);
+          border-right: 1px solid hsl(var(--sidebar-border));
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          z-index: 100;
+          backdrop-filter: blur(10px);
+        }
+
+        .modern-sidebar.collapsed {
+          width: 70px;
+        }
+
+        .modern-sidebar.mobile-open {
+          transform: translateX(0);
+        }
+
+        .mobile-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 99;
+          animation: fadeIn 0.2s ease-out;
+        }
+
+        .sidebar-header {
+          padding: 20px 16px;
+          border-bottom: 1px solid hsl(var(--sidebar-border) / 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          min-height: 72px;
+        }
+
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .brand-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          object-fit: cover;
+        }
+
+        .brand-text {
+          font-size: 18px;
+          font-weight: 700;
+          color: hsl(var(--sidebar-foreground));
+          letter-spacing: -0.02em;
+        }
+
+        .close-btn {
+          background: none;
+          border: none;
+          color: hsl(var(--sidebar-foreground));
+          cursor: pointer;
+          padding: 8px;
+          border-radius: 6px;
+          transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+          background: hsl(var(--sidebar-accent) / 0.5);
+        }
+
+        .sidebar-nav {
+          flex: 1;
+          padding: 16px 0;
+          overflow-y: auto;
+          scrollbar-width: thin;
+          scrollbar-color: hsl(var(--sidebar-accent)) transparent;
+        }
+
+        .nav-section {
+          margin-bottom: 24px;
+        }
+
+        .section-title {
+          font-size: 11px;
+          font-weight: 600;
+          color: hsl(var(--sidebar-foreground) / 0.6);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin: 0 0 8px 16px;
+          padding: 0;
+        }
+
+        .nav-item {
+          margin: 2px 8px;
+        }
+
+        .nav-link {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 16px;
+          color: hsl(var(--sidebar-foreground) / 0.8);
+          text-decoration: none;
+          border-radius: 12px;
+          transition: all 0.2s ease;
+          cursor: pointer;
+          border: none;
+          background: none;
+          width: 100%;
+          text-align: left;
+          position: relative;
+          min-height: 48px;
+        }
+
+        .nav-link:hover {
+          background: hsl(var(--sidebar-accent) / 0.1);
+          color: hsl(var(--sidebar-foreground));
+        }
+
+        .nav-link.active {
+          background: hsl(var(--sidebar-primary) / 0.15);
+          color: hsl(var(--sidebar-primary));
+          font-weight: 500;
+        }
+
+        .nav-link.active::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 3px;
+          height: 20px;
+          background: hsl(var(--sidebar-primary));
+          border-radius: 0 2px 2px 0;
+        }
+
+        .nav-icon {
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .nav-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .nav-text {
+          font-size: 14px;
+          font-weight: 500;
+          line-height: 1.2;
+        }
+
+        .nav-description {
+          font-size: 11px;
+          color: hsl(var(--sidebar-foreground) / 0.6);
+          line-height: 1.2;
+        }
+
+        .chevron {
+          width: 16px;
+          height: 16px;
+          transition: transform 0.2s ease;
+          flex-shrink: 0;
+        }
+
+        .chevron.rotated {
+          transform: rotate(90deg);
+        }
+
+        .submenu {
+          margin-top: 4px;
+          margin-left: 32px;
+          border-left: 2px solid hsl(var(--sidebar-border) / 0.3);
+          padding-left: 12px;
+        }
+
+        .submenu-link {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 12px;
+          color: hsl(var(--sidebar-foreground) / 0.7);
+          text-decoration: none;
+          border-radius: 8px;
+          transition: all 0.2s ease;
+          font-size: 13px;
+          margin: 2px 0;
+        }
+
+        .submenu-link:hover {
+          background: hsl(var(--sidebar-accent) / 0.08);
+          color: hsl(var(--sidebar-foreground));
+        }
+
+        .submenu-link.active {
+          background: hsl(var(--sidebar-primary) / 0.1);
+          color: hsl(var(--sidebar-primary));
+          font-weight: 500;
+        }
+
+        .submenu-icon {
+          width: 16px;
+          height: 16px;
+          flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+          padding: 16px 8px;
+          border-top: 1px solid hsl(var(--sidebar-border) / 0.5);
+        }
+
+        .logout-btn {
+          color: hsl(var(--sidebar-foreground) / 0.8) !important;
+        }
+
+        .logout-btn:hover {
+          background: hsl(var(--destructive) / 0.1) !important;
+          color: hsl(var(--destructive)) !important;
+        }
+
+        .sidebar-toggle {
+          position: fixed;
+          top: 20px;
+          left: 290px;
+          width: 32px;
+          height: 32px;
+          background: hsl(var(--background));
+          border: 1px solid hsl(var(--border));
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          z-index: 101;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modern-sidebar.collapsed + .sidebar-toggle {
+          left: 80px;
+        }
+
+        .sidebar-toggle:hover {
+          background: hsl(var(--muted));
+        }
+
+        .mobile-menu-btn {
+          position: fixed;
+          top: 16px;
+          left: 16px;
+          width: 40px;
+          height: 40px;
+          background: hsl(var(--background));
+          border: 1px solid hsl(var(--border));
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: 101;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          .modern-sidebar {
+            transform: translateX(-100%);
+          }
+
+          .sidebar-toggle {
+            display: none;
+          }
+        }
+
+        @media (min-width: 769px) {
+          .mobile-menu-btn {
+            display: none;
+          }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        /* Custom scrollbar */
+        .sidebar-nav::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+          background: hsl(var(--sidebar-accent) / 0.3);
+          border-radius: 2px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb:hover {
+          background: hsl(var(--sidebar-accent) / 0.5);
+        }
+      `}</style>
     </>
   );
 }
