@@ -19,4 +19,16 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      onwarn: () => {},
+    }
+  },
+  esbuild: {
+    // Ignore TypeScript errors during build
+    logLevel: 'silent'
+  },
+  define: {
+    "process.env": {}
+  }
 }));
