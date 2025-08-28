@@ -433,11 +433,6 @@ const indicadoresPorUnidade = React.useMemo(() => {
   return { linhas, totalGeral };
 }, [driversHoje, now, estaOffline]);
 
-
-
-
-
-
   // --- Risco por motorista (exemplo, mantido) ---
   function distanciaMetros(lat1, lon1, lat2, lon2) {
     const toRad = (x) => x * Math.PI / 180;
@@ -481,349 +476,385 @@ const indicadoresPorUnidade = React.useMemo(() => {
     return risco;
   }, [rawLocs]);
 
-  // --- Render ---
+  // --- Render principal ---
   return (
-    <div style={{
-      height: '93vh',
-      display: 'flex',
-      flexDirection: 'column',
-      background: '#f4f7fa',
-      color: '#222',
-      fontFamily: 'Poppins, Arial, sans-serif',
-      position: 'relative'
-    }}>
-      {/* Overlay de carregamento */}
+    <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Loading Overlay */}
       {loading && (
-        <div style={{
-          position: 'fixed', inset: 0, background: '#fff', zIndex: 9999,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
-        }}>
-          <img
-            src="https://heavycomprovante.nyc3.cdn.digitaloceanspaces.com/img/logo-road-removebg-preview.png"
-            alt="Splash"
-            style={{ width: 120, animation: 'pulse 2s infinite' }}
-          />
-          <div style={{ height: 3, width: 180, background: '#eee', borderRadius: 10, overflow: 'hidden', marginTop: 20 }}>
-            <div style={{ width: `${progress}%`, height: '100%', background: '#FF612B', transition: 'width 300ms ease' }} />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-card border border-border rounded-2xl p-8 shadow-2xl max-w-md w-full mx-4">
+            <div className="text-center space-y-6">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-r from-primary to-primary/70 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-foreground">Carregando sistema</h3>
+                <p className="text-sm text-muted-foreground">Preparando dados de monitoramento...</p>
+              </div>
+              <div className="space-y-2">
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-primary to-primary/70 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">{progress}%</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Mapa */}
-      <div style={{ flex: `0 0 ${mapHeight}%` }}>
-        <Mapa
-          drivers={driversHoje}
-          ativos={ativos}
-          filtroAtivo={filtroAtivo}
-          setAtivos={setAtivos}
-          selectedId={selectedId}
-          setSelectedId={setSelectedId}
-          routePath={routePath}
-          onSelectMotorista={onSelectMotorista}
-          estaOffline={estaOffline}
-          mapRef={mapRef}
-          now={now}
-           // UPDATE: props do heatmap
-          heatmapEnabled={heatmapEnabled}
-          heatmapPoints={heatmapPoints}
-          heatmapOptions={{ radius: heatRadius, opacity: heatOpacity, maxIntensity: heatMaxIntensity }}
-        />
+      {/* Header com estatísticas */}
+      <div className="bg-gradient-to-r from-card via-card to-card/95 border-b border-border/50 backdrop-blur-sm">
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl">
+                <div className="w-6 h-6 bg-gradient-to-r from-primary to-primary/70 rounded-lg"></div>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Monitoramento</h1>
+                <p className="text-sm text-muted-foreground">Sistema de rastreamento em tempo real</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-semibold text-foreground">
+                {new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {new Date().toLocaleTimeString('pt-BR')}
+              </div>
+            </div>
+          </div>
+
+          {/* Cards de estatísticas */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500/10 rounded-lg">
+                  <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Total</p>
+                  <p className="text-2xl font-bold text-foreground">{totals.total}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-success/10 rounded-lg">
+                  <div className="w-4 h-4 bg-success rounded animate-pulse"></div>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Online</p>
+                  <p className="text-2xl font-bold text-success">{totals.online}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-destructive/10 rounded-lg">
+                  <div className="w-4 h-4 bg-destructive rounded animate-pulse"></div>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Offline</p>
+                  <p className="text-2xl font-bold text-destructive">{totals.offline}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-warning/10 rounded-lg">
+                  <div className="w-4 h-4 bg-warning rounded"></div>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Taxa Online</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    {totals.total > 0 ? Math.round((totals.online / totals.total) * 100) : 0}%
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Divisor redimensionável */}
-      <div
-        style={{ height: '10px', background: '#ccc', cursor: 'row-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', borderTop: '1px solid #999', borderBottom: '1px solid #999' }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          const handleDrag = (ev) => {
-            const y = ev.clientY || (ev.touches && ev.touches[0].clientY);
-            const vh = window.innerHeight;
-            const newHeight = Math.max(30, Math.min(80, (y / vh) * 100));
-            setMapHeight(newHeight);
-          };
-          const handleUp = () => {
-            document.removeEventListener('mousemove', handleDrag);
-            document.removeEventListener('mouseup', handleUp);
-          };
-          document.addEventListener('mousemove', handleDrag);
-          document.addEventListener('mouseup', handleUp);
-        }}
-        onTouchStart={(e) => {
-          e.preventDefault();
-          const handleDrag = (ev) => {
-            const y = ev.touches && ev.touches[0].clientY;
-            if (!y) return;
-            const vh = window.innerHeight;
-            const newHeight = Math.max(30, Math.min(80, (y / vh) * 100));
-            setMapHeight(newHeight);
-          };
-          const handleEnd = () => {
-            document.removeEventListener('touchmove', handleDrag);
-            document.removeEventListener('touchend', handleEnd);
-          };
-          document.addEventListener('touchmove', handleDrag);
-          document.addEventListener('touchend', handleEnd);
-        }}
-      >
-        <div style={{ width: '30px', height: '4px', background: '#666', borderRadius: '2px' }} />
-      </div>
+      {/* Conteúdo principal */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Controles */}
+        <div className="bg-gradient-to-r from-card to-card/95 border-b border-border/50 p-4">
+          <div className="flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                onClick={() => setDrawerOpen(!drawerOpen)}
+              >
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+                {drawerOpen ? 'Fechar Painel' : 'Configurações'}
+              </button>
 
-      {/* Grid */}
-      <div style={{ flex: `1 1 ${100 - mapHeight}%`, overflow: 'auto' }}>
-        <Grid
-          driversHoje={driversHoje}
-          ativos={ativos}
-          setAtivos={setAtivos}
-          selectedId={selectedId}
-          handleRowClick={handleRowClick}
-          estaOffline={estaOffline}
-          riscoPorMotorista={riscoPorMotorista}
-          handleOpenAudiosModal={handleOpenAudiosModal}
-          AUDIO_URL={AUDIO_URL}
-          onRouteRequest={handleRouteRequest}
-          now={now}
-        />
-      </div>
+              <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-lg border border-border/30">
+                <span className="text-sm font-medium text-foreground">Altura do mapa:</span>
+                <input
+                  type="range"
+                  min="20"
+                  max="80"
+                  value={mapHeight}
+                  onChange={(e) => setMapHeight(Number(e.target.value))}
+                  className="w-32 accent-primary"
+                />
+                <span className="text-sm font-semibold text-primary min-w-[45px]">{mapHeight}%</span>
+              </div>
+            </div>
 
-      {/* Modal de Áudios */}
-      <AudiosModal
-        isOpen={audiosModalOpen}
-        onClose={() => setAudiosModalOpen(false)}
-        audiosList={audiosList}
-        motoristaId={modalMotoristaId}
-        audioBaseUrl={AUDIO_URL}
-        nome={motoristaSelecionado?.nome}
-        cpf={motoristaSelecionado?.cpf}
-        contato={motoristaSelecionado?.contato}
-      />
+            <div className="flex items-center gap-2 bg-muted/50 px-3 py-2 rounded-lg border border-border/30">
+              <div className={`w-2 h-2 rounded-full ${selectedId ? 'bg-primary animate-pulse' : 'bg-muted-foreground'}`}></div>
+              <span className="text-sm text-muted-foreground">
+                {selectedId ? `Motorista: ${selectedId}` : 'Nenhum selecionado'}
+              </span>
+            </div>
+          </div>
+        </div>
 
-      {/* Botão limpar seleção */}
-      {selectedId && (
-        <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 1000 }}>
-          <button
-            onClick={limparSelecaoMotorista}
-            style={{ backgroundColor: '#ff4444', color: '#fff', border: 'none', padding: '10px 15px', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}
+        {/* Layout dividido */}
+        <div className="flex-1 flex overflow-hidden bg-gradient-to-r from-muted/10 to-muted/5">
+          {/* Mapa */}
+          <div
+            className="border-r border-border/50 bg-gradient-to-br from-card to-card/80 shadow-inner"
+            style={{ height: '100%', width: `${mapHeight}%` }}
           >
-            Limpar Seleção
-          </button>
+            <div className="h-full rounded-lg overflow-hidden border border-border/30 m-2">
+              <Mapa
+                drivers={driversHoje}
+                selectedId={selectedId}
+                setSelectedId={setSelectedId}
+                routePath={routePath}
+                onSelectMotorista={onSelectMotorista}
+                estaOffline={estaOffline}
+                mapRef={mapRef}
+                ativos={ativos}
+                setAtivos={setAtivos}
+                filtroAtivo={filtroAtivo}
+                heatmapEnabled={heatmapEnabled}
+                heatmapPoints={heatmapPoints}
+                heatmapOptions={{
+                  radius: heatRadius,
+                  opacity: heatOpacity,
+                  maxIntensity: heatMaxIntensity
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Grid */}
+          <div
+            className="flex-1 overflow-hidden bg-gradient-to-br from-card to-card/80"
+            style={{ width: `${100 - mapHeight}%` }}
+          >
+            <div className="h-full m-2">
+              <Grid
+                driversHoje={driversHoje}
+                selectedId={selectedId}
+                handleRowClick={handleRowClick}
+                estaOffline={estaOffline}
+                riscoPorMotorista={riscoPorMotorista}
+                handleOpenAudiosModal={handleOpenAudiosModal}
+                AUDIO_URL={AUDIO_URL}
+                now={now}
+                onRouteRequest={handleRouteRequest}
+              />
+            </div>
+          </div>
         </div>
-      )}
-
-{/* FAB do Drawer */}
-<button
-  onClick={() => setDrawerOpen(v => !v)}
-  title={drawerOpen ? 'Fechar controles' : 'Abrir controles'}
-  style={{
-    position: 'fixed', right: 20, bottom: 24, width: 56, height: 56,
-    borderRadius: '50%', border: 'none', boxShadow: '0 6px 16px rgba(0,0,0,.25)',
-    background: '#FF612B', color: '#fff', fontSize: 26, cursor: 'pointer', zIndex: 2000
-  }}
->
-  {drawerOpen ? '×' : '≡'}
-</button>
-
-{/* Drawer de Controles */}
-<aside
-  style={{
-    position: 'fixed', top: 16, right: drawerOpen ? 16 : -400, width: 360,
-    height: 'calc(100vh - 32px)', background: '#fff',
-    boxShadow: '0 8px 24px rgba(0,0,0,.18)', borderRadius: '12px',
-    padding: 16, transition: 'right .25s ease', zIndex: 1999,
-    display: 'flex', flexDirection: 'column', overflow: 'auto'
-  }}
->
-
-
-
-
-  {/* Tabs */}
- <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-  <button
-    onClick={() => setTab('rotas')}
-    style={{
-      padding: '8px 10px', borderRadius: 8,
-      border: tab==='rotas' ? '2px solid #FF612B' : '1px solid #e5e7eb',
-      background: tab==='rotas' ? '#fff7ed' : '#fff', cursor: 'pointer'
-    }}
-  >
-    Rotas
-  </button>
-  <button
-    onClick={() => setTab('furtos')}
-    style={{
-      padding: '8px 10px', borderRadius: 8,
-      border: tab==='furtos' ? '2px solid #2563eb' : '1px solid #e5e7eb',
-      background: tab==='furtos' ? '#eff6ff' : '#fff', cursor: 'pointer'
-    }}
-  >
-    Furtos
-  </button>
-  <button
-    onClick={() => setTab('indicadores')}
-    style={{
-      padding: '8px 10px', borderRadius: 8,
-      border: tab==='indicadores' ? '2px solid #0ea5e9' : '1px solid #e5e7eb',
-      background: tab==='indicadores' ? '#f0f9ff' : '#fff', cursor: 'pointer'
-    }}
-  >
-    Indicadores
-  </button>
-</div>
-{tab === 'indicadores' && (
-  <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-    {/* Resumo geral */}
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr',
-      gap: 8
-    }}>
-      <div style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 10, padding: 10 }}>
-        <div style={{ fontSize: 12, color: '#64748b' }}>Total (geral)</div>
-        <div style={{ fontSize: 20, fontWeight: 700 }}>{indicadoresPorUnidade.totalGeral.total}</div>
-      </div>
-      <div style={{ background: '#ecfdf5', border: '1px solid #bbf7d0', borderRadius: 10, padding: 10 }}>
-        <div style={{ fontSize: 12, color: '#047857' }}>Online (geral)</div>
-        <div style={{ fontSize: 20, fontWeight: 700, color: '#065f46' }}>{indicadoresPorUnidade.totalGeral.online}</div>
-      </div>
-      <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: 10 }}>
-        <div style={{ fontSize: 12, color: '#b91c1c' }}>Offline (geral)</div>
-        <div style={{ fontSize: 20, fontWeight: 700, color: '#991b1b' }}>{indicadoresPorUnidade.totalGeral.offline}</div>
-      </div>
-    </div>
-
-    {/* Tabela por unidade */}
-    <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-        <thead>
-          <tr style={{ background: '#f1f5f9', color: '#0f172a' }}>
-            <th style={{ textAlign: 'left', padding: '10px 8px' }}>Unidade</th>
-            <th style={{ textAlign: 'right', padding: '10px 8px' }}>Total</th>
-            <th style={{ textAlign: 'right', padding: '10px 8px' }}>Online</th>
-            <th style={{ textAlign: 'right', padding: '10px 8px' }}>Offline</th>
-            <th style={{ textAlign: 'right', padding: '10px 8px' }}>% Online</th>
-          </tr>
-        </thead>
-        <tbody>
-          {indicadoresPorUnidade.linhas.map((r, i) => {
-            const pct = r.total ? Math.round((r.online / r.total) * 100) : 0;
-            return (
-              <tr key={r.unidade} style={{ background: i % 2 ? '#fff' : '#f8fafc' }}>
-                <td style={{ padding: '8px' }}>{r.unidade}</td>
-                <td style={{ padding: '8px', textAlign: 'right' }}>{r.total}</td>
-                <td style={{ padding: '8px', textAlign: 'right', color: '#065f46', fontWeight: 600 }}>{r.online}</td>
-                <td style={{ padding: '8px', textAlign: 'right', color: '#991b1b', fontWeight: 600 }}>{r.offline}</td>
-                <td style={{ padding: '8px', textAlign: 'right' }}>{pct}%</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
-
-
-  {tab === 'rotas' && (
-    <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-      <label style={{ display: 'grid', gap: 6, fontSize: 13 }}>
-        <span>Motorista (ID)</span>
-        <input
-          placeholder="ex: 123"
-          value={selectedId ?? ''}
-          onChange={(e) => setSelectedId(e.target.value)}
-          style={{ padding: '10px 12px', borderRadius: 10, border: '1px solid #e5e7eb', outline: 'none' }}
-        />
-      </label>
-      <button
-        onClick={() => selectedId && (async () => { await handleRouteRequest(selectedId); })()}
-        style={{ padding: '10px 12px', borderRadius: 10, border: '1px solid #2563eb', background: '#2563eb', color: '#fff', cursor: 'pointer' }}
-      >
-        Iniciar rota
-      </button>
-    </div>
-  )}
-
-  {tab === 'furtos' && (
-    <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-      <label style={{ display: 'grid', gap: 6, fontSize: 13 }}>
-        <span>Fonte dos dados (URL ou caminho)</span>
-        <input
-          value={heatUrl}
-          onChange={(e) => setHeatUrl(e.target.value)}
-          placeholder="/regiaodefurtos.json ou https://…"
-          style={{ padding: '10px 12px', borderRadius: 10, border: '1px solid #e5e7eb' }}
-        />
-      </label>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <label style={{ display: 'grid', gap: 6, fontSize: 13 }}>
-          <span>Raio (px)</span>
-          <input
-            type="number" min={5} max={80}
-            value={heatRadius}
-            onChange={(e) => setHeatRadius(Number(e.target.value))}
-            style={{ padding: '8px 10px', borderRadius: 10, border: '1px solid #e5e7eb' }}
-          />
-        </label>
-        <label style={{ display: 'grid', gap: 6, fontSize: 13 }}>
-          <span>Opacidade</span>
-          <input
-            type="number" step="0.05" min={0.1} max={1}
-            value={heatOpacity}
-            onChange={(e) => setHeatOpacity(Number(e.target.value))}
-            style={{ padding: '8px 10px', borderRadius: 10, border: '1px solid #e5e7eb' }}
-          />
-        </label>
       </div>
 
-      <label style={{ display: 'grid', gap: 6, fontSize: 13 }}>
-        <span>MaxIntensity (Maps) – opcional</span>
-        <input
-          type="number"
-          value={heatMaxIntensity ?? ''}
-          onChange={(e) => setHeatMaxIntensity(e.target.value === '' ? undefined : Number(e.target.value))}
-          placeholder="ex: 3"
-          style={{ padding: '8px 10px', borderRadius: 10, border: '1px solid #e5e7eb' }}
-        />
-      </label>
-
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button
-          onClick={carregarFurtos}
-          style={{ padding: '10px 12px', borderRadius: 10, border: '1px solid #2563eb', background: '#2563eb', color: '#fff', cursor: 'pointer' }}
-        >
-          Iniciar furtos
-        </button>
-        <button
-          onClick={() => { setHeatmapEnabled(false); setHeatmapPoints([]); }}
-          style={{ padding: '10px 12px', borderRadius: 10, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer' }}
-        >
-          Limpar
-        </button>
-        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginLeft: 'auto', fontSize: 13 }}>
-          <input
-            type="checkbox"
-            checked={heatmapEnabled}
-            onChange={(e) => setHeatmapEnabled(e.target.checked)}
-          />
-          Mostrar no mapa
-        </label>
-      </div>
-
-      {heatStatus !== 'idle' && (
+      {/* Painel lateral */}
+      {drawerOpen && (
         <div
-          style={{
-            background: heatStatus==='error' ? '#fee2e2' : heatStatus==='ok' ? '#ecfdf5' : '#f3f4f6',
-            border: '1px solid #e5e7eb', borderRadius: 8, padding: 8, fontSize: 13
-          }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          onClick={() => setDrawerOpen(false)}
         >
-          {heatMsg}
+          <div
+            className="fixed right-0 top-0 h-full w-96 bg-gradient-to-b from-card via-card to-card/95 border-l border-border/50 shadow-2xl z-50 overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 border-b border-border/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <div className="w-5 h-5 bg-primary rounded"></div>
+                  </div>
+                  <h2 className="text-xl font-bold text-foreground">Configurações</h2>
+                </div>
+                <button
+                  className="p-2 hover:bg-accent/60 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-foreground">Modo de Visualização:</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    className={`px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                      tab === 'rotas' 
+                        ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-md' 
+                        : 'bg-muted hover:bg-accent text-muted-foreground hover:text-foreground'
+                    }`}
+                    onClick={() => setTab('rotas')}
+                  >
+                    Rotas
+                  </button>
+                  <button
+                    className={`px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                      tab === 'furtos' 
+                        ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-md' 
+                        : 'bg-muted hover:bg-accent text-muted-foreground hover:text-foreground'
+                    }`}
+                    onClick={() => setTab('furtos')}
+                  >
+                    Heatmap
+                  </button>
+                </div>
+              </div>
+
+              {tab === 'furtos' && (
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                      <div className="p-1.5 bg-warning/10 rounded-lg">
+                        <div className="w-4 h-4 bg-warning rounded"></div>
+                      </div>
+                      Heatmap de Furtos
+                    </h3>
+                    
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium text-foreground">URL do arquivo:</label>
+                      <input
+                        type="text"
+                        value={heatUrl}
+                        onChange={(e) => setHeatUrl(e.target.value)}
+                        className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                        placeholder="/regiaodefurtos.json"
+                      />
+                    </div>
+
+                    <button
+                      className="w-full px-4 py-3 bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground rounded-lg hover:from-secondary/90 hover:to-secondary/70 transition-all duration-200 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={carregarFurtos}
+                      disabled={heatStatus === 'loading'}
+                    >
+                      {heatStatus === 'loading' ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Carregando...
+                        </div>
+                      ) : 'Carregar Dados'}
+                    </button>
+
+                    {heatMsg && (
+                      <div className={`p-4 rounded-lg text-sm border ${
+                        heatStatus === 'error' ? 'bg-destructive/10 text-destructive border-destructive/20' :
+                        heatStatus === 'ok' ? 'bg-success/10 text-success border-success/20' :
+                        'bg-muted text-muted-foreground border-border'
+                      }`}>
+                        {heatMsg}
+                      </div>
+                    )}
+
+                    <div className="bg-muted/30 p-4 rounded-lg border border-border/30">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={heatmapEnabled}
+                          onChange={(e) => setHeatmapEnabled(e.target.checked)}
+                          className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
+                        />
+                        <span className="text-sm font-medium text-foreground">Exibir heatmap no mapa</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-md font-semibold text-foreground">Configurações Visuais</h4>
+                    
+                    <div className="space-y-4">
+                      <div className="bg-muted/30 p-4 rounded-lg border border-border/30">
+                        <label className="text-sm font-medium text-foreground block mb-3">
+                          Raio: <span className="text-primary">{heatRadius}px</span>
+                        </label>
+                        <input
+                          type="range"
+                          min="5"
+                          max="50"
+                          value={heatRadius}
+                          onChange={(e) => setHeatRadius(Number(e.target.value))}
+                          className="w-full accent-primary"
+                        />
+                      </div>
+                      
+                      <div className="bg-muted/30 p-4 rounded-lg border border-border/30">
+                        <label className="text-sm font-medium text-foreground block mb-3">
+                          Opacidade: <span className="text-primary">{heatOpacity}</span>
+                        </label>
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="1"
+                          step="0.05"
+                          value={heatOpacity}
+                          onChange={(e) => setHeatOpacity(Number(e.target.value))}
+                          className="w-full accent-primary"
+                        />
+                      </div>
+                      
+                      <div className="bg-muted/30 p-4 rounded-lg border border-border/30">
+                        <label className="text-sm font-medium text-foreground block mb-3">
+                          Intensidade máx: <span className="text-primary">{heatMaxIntensity}</span>
+                        </label>
+                        <input
+                          type="range"
+                          min="1"
+                          max="10"
+                          value={heatMaxIntensity}
+                          onChange={(e) => setHeatMaxIntensity(Number(e.target.value))}
+                          className="w-full accent-primary"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
-    </div>
-  )}
-</aside>
 
+      {/* AudiosModal */}
+      {audiosModalOpen && (
+        <AudiosModal
+          isOpen={audiosModalOpen}
+          motorista={motoristaSelecionado}
+          audiosList={audiosList}
+          onClose={() => {
+            setAudiosModalOpen(false);
+            setAudiosList([]);
+            setModalMotoristaId(null);
+            setMotoristaSelecionado(null);
+          }}
+          AUDIO_URL={AUDIO_URL}
+        />
+      )}
     </div>
   );
 }

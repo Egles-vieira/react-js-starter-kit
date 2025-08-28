@@ -121,7 +121,7 @@ export default function Mapa({
 
   // ===== Render
   return (
-    <div id="map-print" style={{ height: '100%', width: '100%' }}>
+    <div className="h-full w-full bg-gradient-to-br from-muted/20 to-muted/40 rounded-lg overflow-hidden shadow-inner border border-border/30">
       <GoogleMap
         mapContainerStyle={{ width: '100%', height: '100%' }}
         center={mapCenter}
@@ -131,7 +131,21 @@ export default function Mapa({
           // cria heatlayer no load (sem depender de regra do eslint)
           ensureHeatLayer(map);
         }}
-        options={{ clickableIcons: false }}
+        options={{ 
+          clickableIcons: false,
+          styles: [
+            {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }]
+            },
+            {
+              featureType: "road",
+              elementType: "labels.icon",
+              stylers: [{ visibility: "off" }]
+            }
+          ]
+        }}
       >
         {drivers.map(motorista => {
           const id = motorista.id_motorista || motorista.id;
@@ -171,14 +185,48 @@ export default function Mapa({
                     lng: parseFloat(motorista.longitude),
                   }}
                 >
-                  <div style={{ fontSize: 13 }}>
-                    <strong>{motorista.nome}</strong><br />
-                    Status: {offline ? 'Offline' : 'Online'}<br />
-                    Velocidade: {motorista.velocidade || 0} km/h<br />
-                    Bateria: {motorista.bateria != null ? motorista.bateria + '%' : '—'}<br />
-                    Última atualização: {motorista.localizacao_timestamp
-                      ? new Date(motorista.localizacao_timestamp).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
-                      : '—'}
+                  <div className="p-3 bg-gradient-to-br from-card to-card/90 rounded-lg shadow-lg min-w-[200px]">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 pb-2 border-b border-border/30">
+                        <div className={`w-3 h-3 rounded-full ${offline ? 'bg-destructive animate-pulse' : 'bg-success'}`}></div>
+                        <h3 className="font-semibold text-foreground">{motorista.nome}</h3>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1">
+                            <span className="text-muted-foreground">Status:</span>
+                            <span className={`font-medium ${offline ? 'text-destructive' : 'text-success'}`}>
+                              {offline ? 'Offline' : 'Online'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-muted-foreground">Velocidade:</span>
+                            <span className="font-medium text-foreground">{motorista.velocidade || 0} km/h</span>
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1">
+                            <span className="text-muted-foreground">Bateria:</span>
+                            <span className={`font-medium ${
+                              motorista.bateria > 50 ? 'text-success' : 
+                              motorista.bateria > 20 ? 'text-warning' : 'text-destructive'
+                            }`}>
+                              {motorista.bateria != null ? motorista.bateria + '%' : '—'}
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {motorista.localizacao_timestamp
+                              ? new Date(motorista.localizacao_timestamp).toLocaleString('pt-BR', { 
+                                  timeZone: 'America/Sao_Paulo',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })
+                              : '—'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </InfoWindow>
               )}
@@ -191,19 +239,19 @@ export default function Mapa({
             path={routePath}
             options={{
               strokeColor: '#FF612B',
-              strokeOpacity: 0.8,
-              strokeWeight: 6,
+              strokeOpacity: 0.9,
+              strokeWeight: 4,
               icons: [{
                 icon: {
                   path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                  scale: 4,
+                  scale: 3,
                   strokeColor: '#ffffff',
-                  strokeWeight: 2,
+                  strokeWeight: 1,
                   fillColor: '#FF612B',
                   fillOpacity: 1,
                 },
                 offset: '0%',
-                repeat: '100px',
+                repeat: '80px',
               }],
             }}
           />
