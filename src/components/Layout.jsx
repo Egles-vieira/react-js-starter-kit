@@ -34,7 +34,7 @@ const Layout = ({ children }) => {
         <div className="main-wrapper">
           <Header title={pageTitle} />
           <main className="content-area">
-            <div className="content-inner">
+            <div className={`content-inner ${basePath === '/monitoramento' ? 'monitoring' : ''}`}>
               {children}
             </div>
           </main>
@@ -67,27 +67,32 @@ const Layout = ({ children }) => {
         }
 
         .content-inner {
-          padding: 24px;
-          max-width: 1400px;
-          margin: 0 auto;
+          padding: 8px;
           width: 100%;
           min-height: calc(100vh - 72px);
         }
+        
+        /* Estilo especial para monitoramento - sem padding */
+        .content-inner.monitoring {
+          padding: 0;
+          height: calc(100vh - 72px);
+          overflow: hidden;
+        }
 
-        /* Responsive adjustments */
+          /* Responsive adjustments */
         @media (max-width: 768px) {
           .main-wrapper {
             margin-left: 0;
           }
 
-          .content-inner {
-            padding: 16px;
+          .content-inner:not(.monitoring) {
+            padding: 8px;
           }
         }
 
         @media (max-width: 480px) {
-          .content-inner {
-            padding: 12px;
+          .content-inner:not(.monitoring) {
+            padding: 4px;
           }
         }
 

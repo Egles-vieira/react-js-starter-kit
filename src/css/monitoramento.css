@@ -1,13 +1,131 @@
 .monitoramento-root {
-  background: #f4f7fa !important;
-  color: #222 !important;
-  font-family: 'Poppins', Arial, sans-serif !important;
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  font-family: 'Roboto', Arial, sans-serif !important;
   min-height: 100vh;
   width: 100vw;
+  overflow: hidden;
 }
 
 .monitoramento-root * {
   font-family: inherit !important;
   color: inherit !important;
   background: transparent;
+}
+
+/* Estilo específico para página de monitoramento */
+.monitoring-layout {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.monitoring-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: hsl(var(--background));
+}
+
+.monitoring-map-container {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.monitoring-grid-container {
+  height: 300px;
+  border-top: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+}
+
+/* Divisor redimensionável */
+.monitoring-divider {
+  height: 4px;
+  background: hsl(var(--border));
+  cursor: row-resize;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.monitoring-divider:hover {
+  background: hsl(var(--primary));
+}
+
+.monitoring-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 2px;
+  background: hsl(var(--muted-foreground));
+  border-radius: 1px;
+}
+
+/* Controles flutuantes */
+.monitoring-floating-controls {
+  position: fixed;
+  top: 80px;
+  right: 8px;
+  z-index: 1000;
+}
+
+.monitoring-drawer {
+  position: fixed;
+  top: 72px;
+  right: 0;
+  width: 350px;
+  height: calc(100vh - 72px);
+  background: hsl(var(--card));
+  border-left: 1px solid hsl(var(--border));
+  z-index: 999;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.monitoring-drawer.open {
+  transform: translateX(0);
+}
+
+/* Botão limpar seleção */
+.monitoring-clear-selection {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+/* Loading overlay específico */
+.monitoring-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: hsl(var(--background));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .monitoring-drawer {
+    width: 100vw;
+    top: 72px;
+  }
+  
+  .monitoring-floating-controls {
+    bottom: 20px;
+    right: 20px;
+    top: auto;
+  }
 }
