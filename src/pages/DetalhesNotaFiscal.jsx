@@ -26,7 +26,10 @@ import {
   Eye,
   Download,
   Share2,
-  MoreHorizontal
+  MoreHorizontal,
+  Navigation,
+  Target,
+  Ruler
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -42,6 +45,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { apiFetch } from '@/services/api';
+import { GoogleMap, Marker, Polyline } from '@react-google-maps/api';
 
 const statusConfig = {
   'aguardando': { 
@@ -398,37 +402,161 @@ export default function DetalhesNotaFiscal() {
         </TabsContent>
 
         <TabsContent value="historico" className="space-y-6">
-          <InfoCard title="Histórico da Nota Fiscal" icon={Clock}>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">Nota Fiscal Criada</p>
-                  <p className="text-xs text-muted-foreground">
-                    {notaFiscal.created_at ? new Date(notaFiscal.created_at).toLocaleString('pt-BR') : 'Data não disponível'}
-                  </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Histórico da Entrega */}
+            <InfoCard title="Histórico da Nota Fiscal" icon={Clock}>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">Nota Fiscal Criada</p>
+                    <p className="text-xs text-muted-foreground">
+                      {notaFiscal.created_at ? new Date(notaFiscal.created_at).toLocaleString('pt-BR') : 'Data não disponível'}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">Última Atualização</p>
-                  <p className="text-xs text-muted-foreground">
-                    {notaFiscal.updated_at ? new Date(notaFiscal.updated_at).toLocaleString('pt-BR') : 'Data não disponível'}
-                  </p>
+                
+                <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">Última Atualização</p>
+                    <p className="text-xs text-muted-foreground">
+                      {notaFiscal.updated_at ? new Date(notaFiscal.updated_at).toLocaleString('pt-BR') : 'Data não disponível'}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  💡 O histórico completo de rastreamento e ocorrências será exibido aqui conforme a integração com sistemas de transporte.
-                </p>
+                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    💡 O histórico completo de rastreamento e ocorrências será exibido aqui conforme a integração com sistemas de transporte.
+                  </p>
+                </div>
               </div>
-            </div>
-          </InfoCard>
+            </InfoCard>
+
+            {/* Mapa e Auditoria */}
+            <InfoCard title="Auditoria de Entrega" icon={Target}>
+              <div className="space-y-4">
+                {/* Mapa pequeno */}
+                <div className="h-48 w-full bg-muted/30 rounded-lg overflow-hidden border">
+                  <AuditMap notaFiscal={notaFiscal} />
+                </div>
+
+                {/* Informações de auditoria */}
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <Target size={16} className="text-green-600 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-green-800">Ponto de Entrega Programado</p>
+                      <p className="text-xs text-green-600 mt-1">
+                        {notaFiscal.endereco_entrega_completo || 'Endereço não informado'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <Navigation size={16} className="text-blue-600 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-800">Local da Finalização</p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Aguardando dados de GPS do motorista
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                    <Ruler size={16} className="text-orange-600 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-orange-800">Distância</p>
+                      <p className="text-xs text-orange-600 mt-1">
+                        Calculando diferença entre pontos...
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Status da auditoria */}
+                  <div className="pt-2 border-t border-border">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">Status da Auditoria:</span>
+                      <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+                        <Clock size={12} className="mr-1" />
+                        Pendente
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </InfoCard>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
   );
 }
+
+// Componente do mapa de auditoria
+const AuditMap = ({ notaFiscal }) => {
+  // Coordenadas padrão (centro de São Paulo) - em produção, extrair do endereço
+  const defaultCenter = { lat: -23.550520, lng: -46.633308 };
+  
+  // Simulando coordenadas do endereço de entrega e local de finalização
+  const deliveryPoint = { lat: -23.550520, lng: -46.633308 };
+  const completionPoint = { lat: -23.551000, lng: -46.634000 }; // Simulado - 50m de diferença
+  
+  const mapOptions = {
+    zoom: 16,
+    center: deliveryPoint,
+    mapTypeId: 'roadmap',
+    disableDefaultUI: true,
+    zoomControl: true,
+    streetViewControl: false,
+    mapTypeControl: false,
+    fullscreenControl: false
+  };
+
+  return (
+    <GoogleMap
+      mapContainerStyle={{ width: '100%', height: '100%' }}
+      options={mapOptions}
+    >
+      {/* Marcador do ponto de entrega programado */}
+      <Marker
+        position={deliveryPoint}
+        icon={{
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: '#10b981',
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2
+        }}
+        title="Ponto de Entrega Programado"
+      />
+      
+      {/* Marcador do local de finalização */}
+      <Marker
+        position={completionPoint}
+        icon={{
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: '#3b82f6',
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2
+        }}
+        title="Local de Finalização"
+      />
+      
+      {/* Linha conectando os pontos */}
+      <Polyline
+        path={[deliveryPoint, completionPoint]}
+        options={{
+          strokeColor: '#f59e0b',
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+          geodesic: true
+        }}
+      />
+    </GoogleMap>
+  );
+};
