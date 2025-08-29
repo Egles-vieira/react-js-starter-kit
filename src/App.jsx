@@ -25,6 +25,7 @@ import ListaNotasFiscais from './pages/ListaNotasFiscais';
 import EmManutencao from './components/EmManutencao';
 import ListaUsuarios from './pages/ListaUsuarios.jsx';
 import Financeiro from './pages/Financeiro.jsx';
+import AgenteIA from './pages/AgenteIA.jsx';
 
 function RotaProtegida({ children }) {
   const token = localStorage.getItem('token');
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="/emmanutencao" element={<RotaProtegida><Layout><EmManutencao /></Layout></RotaProtegida>} />
             <Route path="/listanotasfiscais" element={<RotaProtegida><Layout><ListaNotasFiscais /></Layout></RotaProtegida>} />
             <Route path="/financeiro" element={<RotaProtegida><Layout><Financeiro /></Layout></RotaProtegida>} />
+            <Route path="/agente-ia" element={<RotaProtegida><Layout><AgenteIA /></Layout></RotaProtegida>} />
             
             <Route path="*" element={
               <RotaProtegida>

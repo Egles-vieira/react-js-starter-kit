@@ -21,7 +21,8 @@ import {
   FiNavigation,
   FiDatabase,
   FiActivity,
-  FiX
+  FiX,
+  FiMessageCircle
 } from 'react-icons/fi';
 
 const menuSections = [
@@ -43,6 +44,12 @@ const menuSections = [
         icon: <FiActivity />,
         to: '/monitoramento',
         description: 'Rastreamento em tempo real'
+      },
+      {
+        name: 'Agente IA',
+        icon: <FiMessageCircle />,
+        to: '/agente-ia',
+        description: 'Assistente inteligente'
       },
       {
         name: 'Entregas',
