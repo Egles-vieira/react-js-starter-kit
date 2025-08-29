@@ -41,6 +41,8 @@
     "aws-sdk": "^2.1692.0",
     "axios": "^1.0.0",
     "bcrypt": "^6.0.0",
+    "bullmq": "*",
+    "celebrate": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -49,17 +51,22 @@
     "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.6.0",
     "express": "^5.1.0",
+    "helmet": "*",
     "html2canvas": "^1.4.1",
     "input-otp": "^1.4.2",
+    "joi": "*",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.1",
+    "knex": "*",
     "lottie-react": "^2.4.1",
     "lovable-tagger": "^1.1.9",
     "lucide-react": "^0.542.0",
     "multer": "^2.0.1",
     "next-themes": "^0.3.0",
     "node-cron": "^4.1.1",
+    "opossum": "*",
     "pg": "^8.16.0",
+    "pm2": "*",
     "react": "^18.3.1",
     "react-confirm-alert": "^3.0.6",
     "react-day-picker": "^8.10.1",
@@ -74,19 +81,32 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "sonner": "^1.7.4",
+    "swagger-ui-express": "*",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "*",
     "vaul": "^0.9.9",
     "vite": "^7.1.3",
+
     "zod": "^3.25.76",
     "bull": "^4.12.2"
+
+    "winston": "*",
+
+
   },
   "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "dev": "vite",
-    "build:dev": "vite build --mode development",
-    "preview": "vite preview"
+
+    "client:start": "vite",
+    "client:dev": "vite",
+    "client:build": "vite build",
+    "client:build:dev": "vite build --mode development",
+    "client:preview": "vite preview",
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "migrate": "knex migrate:latest",
+    "seed": "knex seed:run"
+
   },
   "browserslist": {
     "production": [
@@ -103,6 +123,7 @@
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "nodemon": "*",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17"
   }
