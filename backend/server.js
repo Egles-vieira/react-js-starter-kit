@@ -3,8 +3,14 @@ const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const routes = require('./routes');
-// inicia o agendador de tarefas
+
+
 require('./services/scheduler.service');
+=======
+const setupSwagger = require('./config/swagger');
+const config = require('./config/env');
+const logger = require('./config/logger');
+
 
 const app = express();
 const server = http.createServer(app);
@@ -13,22 +19,23 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
-    methods: ['GET', 'POST']
-  }
+    methods: ['GET', 'POST'],
+  },
 });
 
 // WebSocket ativo
 io.on('connection', (socket) => {
-  console.log('✅ Cliente conectado via socket:', socket.id);
+  logger.info('✅ Cliente conectado via socket', { socketId: socket.id });
 
   socket.on('disconnect', () => {
-    console.log('❌ Cliente desconectado:', socket.id);
+    logger.info('❌ Cliente desconectado', { socketId: socket.id });
   });
 });
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
+setupSwagger(app);
 // monta todo o conjunto de rotas em /api
 app.use('/api', routes);
 
@@ -36,7 +43,7 @@ app.get('/', (req, res) => {
   res.send('API com WebSocket está rodando...');
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = config.port || 4000;
 server.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em https://app.roadweb.com.br:${PORT}`);
+  logger.info(`🚀 Servidor rodando em https://app.roadweb.com.br:${PORT}`);
 });
