@@ -11,8 +11,15 @@ const localizacoesController = require('../controllers/localizacoesController');
 const veiculosRoutes = require('./veiculos');
 const registro   = require('./registro');
 const agenteIA   = require('./agenteIA');
-const webhooks = require('./webhooks');
-const jobs = require('./jobs');
+
+
+const integracoes = require('./integracoes.routes');
+const agendamentos = require('./agendamentos.routes');
+const jobs = require('./jobs.routes');
+const arquivos = require('./arquivos.routes');
+const erros = require('./erros.routes');
+const webhooks = require('./webhooks.routes');
+
 
 // Rota pública
 router.post('/login', require('../controllers/authController').login);
@@ -34,8 +41,15 @@ router.use('/drivers-info', require('./driversInfo'));
 router.use('/veiculos', auth, veiculosRoutes);
 router.use('/registro',   registro);
 router.use('/agente-ia', auth, agenteIA);
-router.use('/webhooks', webhooks);
+
+
+router.use('/integracoes', integracoes);
+router.use('/agendamentos', agendamentos);
 router.use('/jobs', jobs);
+router.use('/arquivos', arquivos);
+router.use('/erros', erros);
+router.use('/webhooks', webhooks);
+
 
 
 module.exports = router;
