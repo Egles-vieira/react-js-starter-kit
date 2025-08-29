@@ -89,12 +89,9 @@
     "vite": "^7.1.3",
 
     "zod": "^3.25.76",
-    "bull": "^4.12.2"
-
-    "winston": "*",
-
-
-  },
+    "bull": "^4.12.2",
+    "winston": "*"
+    },
   "scripts": {
 
     "client:start": "vite",
@@ -105,7 +102,8 @@
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
     "migrate": "knex migrate:latest",
-    "seed": "knex seed:run"
+    "seed": "knex seed:run",
+    "test": "jest"
 
   },
   "browserslist": {
@@ -125,6 +123,9 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "nodemon": "*",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "jest": "^29.7.0",
+    "supertest": "^7.1.1",
+    "nock": "^13.5.4"
   }
 }

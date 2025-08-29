@@ -11,6 +11,8 @@ const localizacoesController = require('../controllers/localizacoesController');
 const veiculosRoutes = require('./veiculos');
 const registro   = require('./registro');
 const agenteIA   = require('./agenteIA');
+const webhooks = require('./webhooks');
+const jobs = require('./jobs');
 
 // Rota pública
 router.post('/login', require('../controllers/authController').login);
@@ -29,9 +31,11 @@ router.use('/notas', notas);
 router.use('/notaFiscal', require('./notaFiscal'));
 router.use('/drivers-info', require('./driversInfo'));
 
-router.use('/veiculos', auth, veiculosRoutes);  
+router.use('/veiculos', auth, veiculosRoutes);
 router.use('/registro',   registro);
 router.use('/agente-ia', auth, agenteIA);
+router.use('/webhooks', webhooks);
+router.use('/jobs', jobs);
 
 
 module.exports = router;
