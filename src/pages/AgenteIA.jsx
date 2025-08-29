@@ -57,13 +57,18 @@ export default function AgenteIA() {
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
+
         content: 'Erro ao processar a mensagem.',
         timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, botMessage]);
+
+    }
+
     }
     
     setIsLoading(false);
+
   };
   
   const handleKeyPress = (e) => {

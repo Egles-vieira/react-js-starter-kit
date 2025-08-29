@@ -28,8 +28,10 @@ router.use('/romaneios', require('./romaneios'));
 router.use('/notas', notas);
 router.use('/notaFiscal', require('./notaFiscal'));
 router.use('/drivers-info', require('./driversInfo'));
+
 router.use('/veiculos', auth, veiculosRoutes);  
 router.use('/registro',   registro);
 router.use('/agente-ia', auth, agenteIA);
+
 
 module.exports = router;
