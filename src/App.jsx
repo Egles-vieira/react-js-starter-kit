@@ -22,6 +22,7 @@ import ListaClientes from './pages/ListaClientes';
 import ListaTransportadoras from './pages/ListaTransportadoras';
 import ListaMotoristas from './pages/ListaMotoristas';
 import ListaNotasFiscais from './pages/ListaNotasFiscais';
+import DetalhesNotaFiscal from './pages/DetalhesNotaFiscal';
 import EmManutencao from './components/EmManutencao';
 import ListaUsuarios from './pages/ListaUsuarios.jsx';
 import Financeiro from './pages/Financeiro.jsx';
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="/listamotoristas" element={<RotaProtegida><Layout><ListaMotoristas /></Layout></RotaProtegida>} />
             <Route path="/emmanutencao" element={<RotaProtegida><Layout><EmManutencao /></Layout></RotaProtegida>} />
             <Route path="/listanotasfiscais" element={<RotaProtegida><Layout><ListaNotasFiscais /></Layout></RotaProtegida>} />
+            <Route path="/nota-fiscal/:id" element={<RotaProtegida><Layout><DetalhesNotaFiscal /></Layout></RotaProtegida>} />
             <Route path="/financeiro" element={<RotaProtegida><Layout><Financeiro /></Layout></RotaProtegida>} />
             <Route path="/agente-ia" element={<RotaProtegida><Layout><AgenteIA /></Layout></RotaProtegida>} />
             

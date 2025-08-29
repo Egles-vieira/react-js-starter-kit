@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,6 +76,7 @@ const statusConfig = {
 };
 
 export default function ListaNotasFiscais() {
+  const navigate = useNavigate();
   const [notasFiscais, setNotasFiscais] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtros, setFiltros] = useState({
@@ -140,6 +142,10 @@ export default function ListaNotasFiscais() {
     }
   };
 
+  const navegarParaDetalhes = (notaId) => {
+    navigate(`/nota-fiscal/${notaId}`);
+  };
+
   const StatusBadge = ({ status }) => {
     const config = statusConfig[status] || statusConfig.aguardando;
     const IconComponent = config.icon;
@@ -153,7 +159,7 @@ export default function ListaNotasFiscais() {
   };
 
   const NotaCard = ({ nota }) => (
-    <Card className="h-full hover:shadow-lg transition-all duration-200 border border-border">
+    <Card className="h-full hover:shadow-lg transition-all duration-200 border border-border cursor-pointer" onClick={() => navegarParaDetalhes(nota.id)}>
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <div className="flex-1">
@@ -171,8 +177,8 @@ export default function ListaNotasFiscais() {
                 <MoreHorizontal size={16} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-48" onClick={(e) => e.stopPropagation()}>
+              <DropdownMenuItem onClick={() => navegarParaDetalhes(nota.id)}>
                 <Eye size={14} className="mr-2" />
                 Visualizar Detalhes
               </DropdownMenuItem>
@@ -316,9 +322,10 @@ export default function ListaNotasFiscais() {
               {notasFiltradas.map((nota, index) => (
                 <div 
                   key={nota.id} 
-                  className={`grid grid-cols-12 gap-4 p-4 hover:bg-muted/30 transition-colors ${
+                  className={`grid grid-cols-12 gap-4 p-4 hover:bg-muted/30 transition-colors cursor-pointer ${
                     index % 2 === 0 ? 'bg-background' : 'bg-muted/10'
                   }`}
+                  onClick={() => navegarParaDetalhes(nota.id)}
                 >
                   <div className="col-span-2">
                     <div className="flex items-center gap-2">
@@ -379,8 +386,8 @@ export default function ListaNotasFiscais() {
                           <MoreHorizontal size={16} />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenuItem onClick={() => navegarParaDetalhes(nota.id)}>
                           <Eye size={14} className="mr-2" />
                           Detalhes
                         </DropdownMenuItem>
