@@ -1,5 +1,5 @@
 // src/services/api.js
-import { API_URL } from './Config';
+import API_URL from './Config';
 
 export async function apiFetch(endpoint, options = {}) {
   const token = localStorage.getItem('token');
