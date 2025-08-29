@@ -85,7 +85,9 @@
     "build": "vite build",
     "dev": "vite",
     "build:dev": "vite build --mode development",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "migrate": "node backend/migrate.js",
+    "seed": "node backend/seed.js"
   },
   "browserslist": {
     "production": [
