@@ -79,7 +79,7 @@ export default function ListaNotasFiscais() {
   const [loading, setLoading] = useState(true);
   const [filtros, setFiltros] = useState({
     busca: '',
-    status: '',
+    status: 'todos',
     dataInicio: '',
     dataFim: '',
     transportadora: ''
@@ -110,7 +110,7 @@ export default function ListaNotasFiscais() {
       nota.nro_pedido?.toString().includes(filtros.busca) ||
       nota.transportadora_nome?.toLowerCase().includes(filtros.busca.toLowerCase());
 
-    const statusMatch = !filtros.status || nota.status_nf === filtros.status;
+    const statusMatch = filtros.status === 'todos' || !filtros.status || nota.status_nf === filtros.status;
     
     return buscaMatch && statusMatch;
   });
@@ -320,12 +320,12 @@ export default function ListaNotasFiscais() {
               />
             </div>
             
-            <Select value={filtros.status} onValueChange={(value) => setFiltros(prev => ({ ...prev, status: value }))}>
+            <Select value={filtros.status} onValueChange={(value) => setFiltros(prev => ({ ...prev, status: value === 'todos' ? '' : value }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Todos os status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os status</SelectItem>
+                <SelectItem value="todos">Todos os status</SelectItem>
                 {Object.entries(statusConfig).map(([key, config]) => (
                   <SelectItem key={key} value={key}>
                     {config.label}
