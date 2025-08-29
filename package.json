@@ -41,8 +41,6 @@
     "aws-sdk": "^2.1692.0",
     "axios": "^1.0.0",
     "bcrypt": "^6.0.0",
-    "bullmq": "*",
-    "celebrate": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -51,7 +49,6 @@
     "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.6.0",
     "express": "^5.1.0",
-    "helmet": "*",
     "html2canvas": "^1.4.1",
     "input-otp": "^1.4.2",
     "joi": "*",
@@ -89,9 +86,14 @@
     "vite": "^7.1.3",
 
     "zod": "^3.25.76",
-    "bull": "^4.12.2",
     "winston": "*"
-    },
+  },
+  "optionalDependencies": {
+    "bull": "^4.12.2",
+    "bullmq": "*",
+    "celebrate": "*",
+    "helmet": "*"
+  },
   "scripts": {
 
     "client:start": "vite",
