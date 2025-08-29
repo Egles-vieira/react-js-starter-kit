@@ -78,7 +78,8 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
     "vite": "^7.1.3",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "bull": "^4.12.2"
   },
   "scripts": {
     "start": "vite",
