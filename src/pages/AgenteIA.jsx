@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiSend, FiMessageCircle, FiBot, FiUser, FiLoader } from 'react-icons/fi';
+import { FiSend, FiMessageCircle, FiCpu, FiUser, FiLoader } from 'react-icons/fi';
 
 export default function AgenteIA() {
   const [messages, setMessages] = useState([
@@ -91,7 +91,7 @@ export default function AgenteIA() {
       <div className="chat-header">
         <div className="header-content">
           <div className="bot-avatar">
-            <FiBot />
+            <FiCpu />
           </div>
           <div className="header-info">
             <h1>Agente IA - Assistente de Entregas</h1>
@@ -122,7 +122,7 @@ export default function AgenteIA() {
         {messages.map((message) => (
           <div key={message.id} className={`message ${message.type}`}>
             <div className="message-avatar">
-              {message.type === 'bot' ? <FiBot /> : <FiUser />}
+              {message.type === 'bot' ? <FiCpu /> : <FiUser />}
             </div>
             <div className="message-content">
               <div className="message-text">
@@ -141,7 +141,7 @@ export default function AgenteIA() {
         {isLoading && (
           <div className="message bot">
             <div className="message-avatar">
-              <FiBot />
+              <FiCpu />
             </div>
             <div className="message-content">
               <div className="typing-indicator">
