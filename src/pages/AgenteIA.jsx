@@ -37,9 +37,7 @@ export default function AgenteIA() {
     setNewMessage('');
     setIsLoading(true);
 
-    // Simular resposta do bot (aqui você integraria com sua API de IA)
-    setTimeout(() => {
-         try {
+    try {
       const data = await apiFetch('/api/agente-ia/chat', {
         method: 'POST',
         body: JSON.stringify({
@@ -63,9 +61,11 @@ export default function AgenteIA() {
         timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, botMessage]);
-      setIsLoading(false);
     }
+    
+    setIsLoading(false);
   };
+  
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
