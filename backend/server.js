@@ -3,9 +3,14 @@ const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const routes = require('./routes');
+
+
+require('./services/scheduler.service');
+=======
 const setupSwagger = require('./config/swagger');
 const config = require('./config/env');
 const logger = require('./config/logger');
+
 
 const app = express();
 const server = http.createServer(app);
