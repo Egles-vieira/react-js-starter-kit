@@ -9,7 +9,8 @@ const notas = require('./notas');
 const notaFiscal = require('./notaFiscal');
 const localizacoesController = require('../controllers/localizacoesController');
 const veiculosRoutes = require('./veiculos');
-const registro   = require('./registro'); 
+const registro   = require('./registro');
+const agenteIA   = require('./agenteIA');
 
 // Rota pública
 router.post('/login', require('../controllers/authController').login);
@@ -28,7 +29,8 @@ router.use('/notas', notas);
 router.use('/notaFiscal', require('./notaFiscal'));
 router.use('/drivers-info', require('./driversInfo'));
 router.use('/veiculos', auth, veiculosRoutes);
-router.use('/registro',   registro);    
+router.use('/registro',   registro);
+router.use('/agente-ia', auth, agenteIA);
 
 
 module.exports = router;

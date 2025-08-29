@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiSend, FiMessageCircle, FiCpu, FiUser, FiLoader } from 'react-icons/fi';
+import { apiFetch } from '@/services/api';
 
 export default function AgenteIA() {
   const [messages, setMessages] = useState([
@@ -36,39 +37,33 @@ export default function AgenteIA() {
     setNewMessage('');
     setIsLoading(true);
 
-    // Simular resposta do bot (aqui você integraria com sua API de IA)
-    setTimeout(() => {
+    try {
+      const data = await apiFetch('/api/agente-ia/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+          message: userMessage.content,
+          history: messages
+        })
+      });
+
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        content: generateBotResponse(userMessage.content),
+        content: data.reply + (data.sources ? `\n\n${JSON.stringify(data.sources)}` : ''),
         timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, botMessage]);
+    } catch (err) {
+      const botMessage = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: 'Erro ao processar a mensagem.',
+        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, botMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
-  };
-
-  const generateBotResponse = (userInput) => {
-    const input = userInput.toLowerCase();
-    
-    if (input.includes('entrega') || input.includes('delivery')) {
-      return 'Para consultar entregas, posso ajudar com:\n\n• Status atual das entregas\n• Localização em tempo real\n• Previsão de chegada\n• Histórico de entregas\n\nQual informação específica você gostaria de consultar?';
     }
-    
-    if (input.includes('motorista') || input.includes('driver')) {
-      return 'Sobre motoristas, posso fornecer:\n\n• Localização atual dos motoristas\n• Status das rotas\n• Histórico de entregas por motorista\n• Avaliações e performance\n\nQue informação sobre motoristas você precisa?';
-    }
-    
-    if (input.includes('romaneio') || input.includes('nota fiscal')) {
-      return 'Para consultas de documentos:\n\n• Status de romaneios\n• Notas fiscais vinculadas\n• Documentos pendentes\n• Histórico de documentação\n\nQual documento você gostaria de consultar?';
-    }
-    
-    if (input.includes('localização') || input.includes('rastreamento') || input.includes('onde')) {
-      return 'Para rastreamento e localização:\n\n• Posição atual dos veículos\n• Rota planejada vs executada\n• Tempo estimado de chegada\n• Histórico de trajetos\n\nQual veículo ou entrega você gostaria de rastrear?';
-    }
-    
-    return 'Entendi sua pergunta. Posso te ajudar com informações sobre:\n\n• 📦 Entregas e status\n• 🚛 Motoristas e veículos\n• 📋 Romaneios e notas fiscais\n• 📍 Rastreamento e localização\n• 💰 Informações financeiras\n\nPoderia ser mais específico sobre o que você precisa?';
   };
 
   const handleKeyPress = (e) => {
