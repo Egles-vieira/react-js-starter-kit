@@ -3,6 +3,8 @@ const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const routes = require('./routes');
+// inicia o agendador de tarefas
+require('./services/scheduler.service');
 
 const app = express();
 const server = http.createServer(app);
