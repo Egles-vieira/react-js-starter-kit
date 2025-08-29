@@ -91,6 +91,7 @@
     "zod": "^3.25.76"
   },
   "scripts": {
+
     "client:start": "vite",
     "client:dev": "vite",
     "client:build": "vite build",
@@ -100,6 +101,7 @@
     "dev": "nodemon backend/server.js",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run"
+
   },
   "browserslist": {
     "production": [
