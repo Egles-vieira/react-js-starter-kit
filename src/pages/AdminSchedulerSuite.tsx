@@ -1,4 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 /**
  * Road‑RW — Admin Suite (Agendamentos / Execuções / Erros / Arquivos / Logs)
@@ -75,22 +84,39 @@ function FilterBar({ onApply, placeholder = "Buscar…", extra }: {
   const [to, setTo] = useState("");
 
   return (
-    <div style={{display:"grid", gridTemplateColumns:"1fr 160px 160px 140px", gap: 8, alignItems: "end"}}>
-      <label style={{display:"grid", gap:4}}>
-        <span style={{fontSize:12, opacity:.75}}>Busca</span>
-        <input value={q} onChange={(e)=>setQ(e.target.value)} placeholder={placeholder} />
-      </label>
-      <label style={{display:"grid", gap:4}}>
-        <span style={{fontSize:12, opacity:.75}}>De (data)</span>
-        <input type="date" value={from} onChange={(e)=>setFrom(e.target.value)} />
-      </label>
-      <label style={{display:"grid", gap:4}}>
-        <span style={{fontSize:12, opacity:.75}}>Até (data)</span>
-        <input type="date" value={to} onChange={(e)=>setTo(e.target.value)} />
-      </label>
-      <div style={{display:"flex", gap:8}}>
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">Busca</Label>
+        <Input 
+          value={q} 
+          onChange={(e)=>setQ(e.target.value)} 
+          placeholder={placeholder}
+          className="h-9"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">De (data)</Label>
+        <Input 
+          type="date" 
+          value={from} 
+          onChange={(e)=>setFrom(e.target.value)}
+          className="h-9"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">Até (data)</Label>
+        <Input 
+          type="date" 
+          value={to} 
+          onChange={(e)=>setTo(e.target.value)}
+          className="h-9"
+        />
+      </div>
+      <div className="flex gap-2">
         {extra}
-        <button onClick={()=>onApply?.({ q, from, to })}>Filtrar</button>
+        <Button size="sm" onClick={()=>onApply?.({ q, from, to })}>
+          Filtrar
+        </Button>
       </div>
     </div>
   );
@@ -98,27 +124,21 @@ function FilterBar({ onApply, placeholder = "Buscar…", extra }: {
 
 function Section({ title, children, right }: { title: string; children: React.ReactNode; right?: React.ReactNode }){
   return (
-    <section style={{border:"1px solid #e5e7eb", borderRadius:8, overflow:"hidden", background:"white"}}>
-      <header style={{display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", borderBottom:"1px solid #e5e7eb", background:"#f9fafb"}}>
-        <h2 style={{margin:0, fontSize:14, fontWeight:600}}>{title}</h2>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-sm font-semibold">{title}</CardTitle>
         {right}
-      </header>
-      <div style={{padding:16}}>{children}</div>
-    </section>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
   );
 }
 
-function Badge({ ok, children }: { ok?: boolean; children: React.ReactNode }){
+function StatusBadge({ ok, children }: { ok?: boolean; children: React.ReactNode }){
   return (
-    <span style={{
-      display:"inline-block",
-      padding:"2px 8px",
-      borderRadius:999,
-      fontSize:12,
-      color: ok ? "#065f46" : "#991b1b",
-      background: ok ? "#d1fae5" : "#fee2e2",
-      border: `1px solid ${ok?"#10b981":"#fca5a5"}`
-    }}>{children}</span>
+    <Badge variant={ok ? "default" : "destructive"} className="text-xs">
+      {children}
+    </Badge>
   );
 }
 
@@ -128,14 +148,26 @@ function Badge({ ok, children }: { ok?: boolean; children: React.ReactNode }){
 function Modal({ open, onClose, title, children, footer }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; footer?: React.ReactNode }){
   if (!open) return null;
   return (
-    <div style={{position:"fixed", inset:0, background:"rgba(0,0,0,.35)", display:"grid", placeItems:"center", zIndex:50}}>
-      <div style={{width:"min(800px, 92vw)", background:"#fff", borderRadius:8, overflow:"hidden", boxShadow:"0 10px 30px rgba(0,0,0,.2)"}}>
-        <header style={{padding:"12px 16px", borderBottom:"1px solid #e5e7eb", background:"#f9fafb", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <strong>{title}</strong>
-          <button onClick={onClose} aria-label="Fechar">✕</button>
-        </header>
-        <div style={{padding:16}}>{children}</div>
-        {footer && <footer style={{padding:16, borderTop:"1px solid #e5e7eb", background:"#fafafa"}}>{footer}</footer>}
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="w-full max-w-2xl bg-background rounded-lg shadow-lg overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b bg-muted/50">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose} 
+            className="h-8 w-8 p-0"
+            aria-label="Fechar"
+          >
+            ✕
+          </Button>
+        </div>
+        <div className="p-6">{children}</div>
+        {footer && (
+          <div className="p-4 border-t bg-muted/30">
+            {footer}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -143,10 +175,10 @@ function Modal({ open, onClose, title, children, footer }: { open: boolean; onCl
 
 function Field({ label, children }: { label: string; children: React.ReactNode }){
   return (
-    <label style={{display:"grid", gap:4}}>
-      <span style={{fontSize:12, opacity:.75}}>{label}</span>
+    <div className="space-y-2">
+      <Label className="text-sm font-medium">{label}</Label>
       {children}
-    </label>
+    </div>
   );
 }
 
@@ -311,260 +343,437 @@ export default function AdminSchedulerSuite() {
   // UI
   // -----------------------------
   return (
-    <div style={{fontFamily:"ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell", padding: 16, background: "#f3f4f6"}}>
-      <h1 style={{fontSize: 22, fontWeight: 700, marginBottom: 12}}>Admin — Scheduler / Jobs / Erros</h1>
-      <p style={{marginTop:0, marginBottom:16, color:"#374151"}}>
-        {"Modo: "}
-        <strong>{Object.values(mocked).some(Boolean) ? "preview com mocks (sem backend em consultas)" : "dados reais da API"}</strong>
-      </p>
+    <div className="min-h-screen bg-background p-6">
+      <div className="container max-w-7xl mx-auto space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Admin — Scheduler / Jobs / Erros</h1>
+          <p className="text-muted-foreground">
+            {"Modo: "}
+            <span className="font-semibold">
+              {Object.values(mocked).some(Boolean) ? "preview com mocks (sem backend em consultas)" : "dados reais da API"}
+            </span>
+          </p>
+        </div>
 
-      {/* Tabs */}
-      <div style={{display:"flex", gap:8, marginBottom:12, flexWrap:"wrap"}}>
-        {TABS.map(t => (
-          <button key={t} onClick={()=>setTab(t)}
-            style={{
-              padding: "8px 12px",
-              borderRadius: 999,
-              border: "1px solid #d1d5db",
-              background: tab===t? "#111827": "#fff",
-              color: tab===t? "#fff": "#111827",
-              cursor:"pointer"
-            }}>
-            {t}
-          </button>
-        ))}
-      </div>
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2">
+          {TABS.map(t => (
+            <Button 
+              key={t} 
+              onClick={()=>setTab(t)}
+              variant={tab===t ? "default" : "outline"}
+              size="sm"
+              className="rounded-full"
+            >
+              {t}
+            </Button>
+          ))}
+        </div>
 
-      {tab === "Cron Health" && (
-        <div className="stack" style={{display:"grid", gap:12}}>
-          <Section title="Saúde do Scheduler">
-            {health ? (
-              <div style={{display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:12}}>
-                <div style={{border:"1px solid #e5e7eb", borderRadius:8, padding:12}}>
-                  <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-                    <strong>Scheduler</strong>
-                    <Badge ok={!!health.scheduler_ok}>{health.scheduler_ok? "OK":"FALHA"}</Badge>
-                  </div>
-                  <div style={{marginTop:8, fontSize:12, color:"#374151"}}>last_reconcile_at: {health.last_reconcile_at}</div>
+        {tab === "Cron Health" && (
+          <div className="space-y-6">
+            <Section title="Saúde do Scheduler">
+              {health ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-semibold">Scheduler</h4>
+                        <StatusBadge ok={!!health.scheduler_ok}>
+                          {health.scheduler_ok? "OK":"FALHA"}
+                        </StatusBadge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        last_reconcile_at: {health.last_reconcile_at}
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <h4 className="font-semibold">Agendamentos (DB)</h4>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        total: {health.db_agendamentos?.length ?? 0}
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <h4 className="font-semibold">Repeatables (Bull)</h4>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        total: {health.bull_repeatables?.length ?? 0}
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
-                <div style={{border:"1px solid #e5e7eb", borderRadius:8, padding:12}}>
-                  <strong>Agendamentos (DB)</strong>
-                  <div style={{marginTop:8, fontSize:12}}>total: {health.db_agendamentos?.length ?? 0}</div>
-                </div>
-                <div style={{border:"1px solid #e5e7eb", borderRadius:8, padding:12}}>
-                  <strong>Repeatables (Bull)</strong>
-                  <div style={{marginTop:8, fontSize:12}}>total: {health.bull_repeatables?.length ?? 0}</div>
-                </div>
-              </div>
-            ) : (
-              <div>Carregando…</div>
-            )}
-          </Section>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">Carregando…</div>
+              )}
+            </Section>
 
-          <Section title="Payload bruto (debug)">
-            <pre style={{fontSize:12, background:"#111827", color:"#e5e7eb", padding:12, borderRadius:8, overflow:"auto"}}>
-              {JSON.stringify(health, null, 2)}
-            </pre>
-          </Section>
-        </div>
-      )}
-
-      {tab === "Agendamentos" && (
-        <div className="stack" style={{display:"grid", gap:12}}>
-          <Section title="Ações" right={<button onClick={openCreate}>Novo</button>}>
-            <FilterBar onApply={(f)=>{
-              const q = f.q?.toLowerCase?.() || "";
-              setAgendamentos(prev => prev.filter(x => String(x.nome).toLowerCase().includes(q)));
-            }} />
-          </Section>
-
-          <Section title="Lista de Agendamentos" right={<span style={{fontSize:12, color:"#6b7280"}}>{agendamentos.length} itens</span>}>
-            <div style={{overflow:"auto"}}>
-              <table style={{width:"100%", fontSize:14, borderCollapse:"collapse"}}>
-                <thead>
-                  <tr style={{background:"#f9fafb"}}>
-                    {"Nome,Transportadora,Cron,Janela,Status,Ações".split(",").map(h => (
-                      <th key={h} style={{textAlign:"left", padding:8, borderBottom:"1px solid #e5e7eb"}}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {agendamentos.length === 0 && (
-                    <tr><td style={{padding:8}} colSpan={6}>Nenhum registro</td></tr>
-                  )}
-                  {agendamentos.map(r => (
-                    <tr key={r.id} style={{borderTop:"1px solid #e5e7eb"}}>
-                      <td style={{padding:8, fontWeight:600}}>{r.nome}</td>
-                      <td style={{padding:8}}>{r.transportadora_id}</td>
-                      <td style={{padding:8, fontFamily:"ui-monospace, SFMono-Regular, Menlo, Monaco"}}>{r.cron}</td>
-                      <td style={{padding:8}}>{r.janela_minutos ?? 5} min</td>
-                      <td style={{padding:8}}><Badge ok={!!r.ativo}>{r.ativo? "Ativo":"Inativo"}</Badge></td>
-                      <td style={{padding:8, display:"flex", gap:8, flexWrap:"wrap"}}>
-                        <button onClick={()=>openEdit(r)}>Editar</button>
-                        <button onClick={()=>toggleActive(r)}>{r.ativo?"Pausar":"Ativar"}</button>
-                        <button onClick={()=>runNow(r.id)}>Rodar agora</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Section>
-        </div>
-      )}
-
-      {tab === "Execuções" && (
-        <div className="stack" style={{display:"grid", gap:12}}>
-          <Section title="Filtros"><FilterBar onApply={()=>{}} /></Section>
-          <Section title="Execuções" right={<span style={{fontSize:12, color:"#6b7280"}}>{execucoes.length} itens</span>}>
-            <div style={{overflow:"auto"}}>
-              <table style={{width:"100%", fontSize:14, borderCollapse:"collapse"}}>
-                <thead>
-                  <tr style={{background:"#f9fafb"}}>
-                    {"ID,Agendamento,Status,Início,Fim,Trace".split(",").map(h => (
-                      <th key={h} style={{textAlign:"left", padding:8, borderBottom:"1px solid #e5e7eb"}}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {execucoes.length === 0 && (<tr><td style={{padding:8}} colSpan={6}>Nenhum registro</td></tr>)}
-                  {execucoes.map(r => (
-                    <tr key={r.id} style={{borderTop:"1px solid #e5e7eb"}}>
-                      <td style={{padding:8, fontFamily:"ui-monospace"}}>{r.id}</td>
-                      <td style={{padding:8}}>{r.agendamento_id}</td>
-                      <td style={{padding:8}}><Badge ok={!!r.sucesso}>{r.sucesso?"OK":"FALHA"}</Badge></td>
-                      <td style={{padding:8}}>{r.inicio || r.created_at}</td>
-                      <td style={{padding:8}}>{r.fim || r.updated_at}</td>
-                      <td style={{padding:8, fontFamily:"ui-monospace"}}>{r.trace_id}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Section>
-        </div>
-      )}
-
-      {tab === "Erros" && (
-        <div className="stack" style={{display:"grid", gap:12}}>
-          <Section title="Filtros"><FilterBar onApply={()=>{}} /></Section>
-          <Section title="Erros de Integração" right={<span style={{fontSize:12, color:"#6b7280"}}>{erros.length} itens</span>}>
-            <div style={{overflow:"auto"}}>
-              <table style={{width:"100%", fontSize:14, borderCollapse:"collapse"}}>
-                <thead>
-                  <tr style={{background:"#f9fafb"}}>
-                    {"Quando,Agendamento,Código,Mensagem,Trace".split(",").map(h => (
-                      <th key={h} style={{textAlign:"left", padding:8, borderBottom:"1px solid #e5e7eb"}}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {erros.length === 0 && (<tr><td style={{padding:8}} colSpan={5}>Nenhum registro</td></tr>)}
-                  {erros.map(r => (
-                    <tr key={r.id} style={{borderTop:"1px solid #e5e7eb"}}>
-                      <td style={{padding:8}}>{r.created_at || r.data}</td>
-                      <td style={{padding:8}}>{r.agendamento_id}</td>
-                      <td style={{padding:8}}>{r.codigo || r.http_status}</td>
-                      <td style={{padding:8}}><pre style={{margin:0, whiteSpace:"pre-wrap", fontSize:12}}>{r.mensagem || r.detalhes}</pre></td>
-                      <td style={{padding:8, fontFamily:"ui-monospace"}}>{r.trace_id}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Section>
-        </div>
-      )}
-
-      {tab === "Arquivos" && (
-        <div className="stack" style={{display:"grid", gap:12}}>
-          <Section title="Filtros"><FilterBar onApply={()=>{}} /></Section>
-          <Section title="Arquivos Processados" right={<span style={{fontSize:12, color:"#6b7280"}}>{arquivos.length} itens</span>}>
-            <div style={{overflow:"auto"}}>
-              <table style={{width:"100%", fontSize:14, borderCollapse:"collapse"}}>
-                <thead>
-                  <tr style={{background:"#f9fafb"}}>
-                    {"Quando,Arquivo,Origem,Bytes,Trace".split(",").map(h => (
-                      <th key={h} style={{textAlign:"left", padding:8, borderBottom:"1px solid #e5e7eb"}}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {arquivos.length === 0 && (<tr><td style={{padding:8}} colSpan={5}>Nenhum registro</td></tr>)}
-                  {arquivos.map(r => (
-                    <tr key={r.id} style={{borderTop:"1px solid #e5e7eb"}}>
-                      <td style={{padding:8}}>{r.created_at}</td>
-                      <td style={{padding:8}}>{r.nome || r.path}</td>
-                      <td style={{padding:8}}>{r.origem || r.transportadora_id}</td>
-                      <td style={{padding:8}}>{r.tamanho || r.bytes}</td>
-                      <td style={{padding:8, fontFamily:"ui-monospace"}}>{r.trace_id}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Section>
-        </div>
-      )}
-
-      {tab === "Logs" && (
-        <div className="stack" style={{display:"grid", gap:12}}>
-          <Section title="Filtros"><FilterBar onApply={()=>{}} /></Section>
-          <Section title="Logs" right={<span style={{fontSize:12, color:"#6b7280"}}>{logs.length} itens</span>}>
-            <div style={{overflow:"auto"}}>
-              <table style={{width:"100%", fontSize:14, borderCollapse:"collapse"}}>
-                <thead>
-                  <tr style={{background:"#f9fafb"}}>
-                    {"Quando,Nível,Mensagem,Trace".split(",").map(h => (
-                      <th key={h} style={{textAlign:"left", padding:8, borderBottom:"1px solid #e5e7eb"}}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {logs.length === 0 && (<tr><td style={{padding:8}} colSpan={4}>Nenhum registro</td></tr>)}
-                  {logs.map(r => (
-                    <tr key={r.id || r.timestamp} style={{borderTop:"1px solid #e5e7eb"}}>
-                      <td style={{padding:8}}>{r.timestamp || r.created_at}</td>
-                      <td style={{padding:8}}>{r.level || r.nivel}</td>
-                      <td style={{padding:8}}><pre style={{margin:0, whiteSpace:"pre-wrap", fontSize:12}}>{r.message || r.mensagem}</pre></td>
-                      <td style={{padding:8, fontFamily:"ui-monospace"}}>{r.trace_id}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Section>
-        </div>
-      )}
-
-      {/* Modal de criar/editar */}
-      <Modal open={modalOpen} onClose={()=>setModalOpen(false)} title={editing? 'Editar agendamento' : 'Novo agendamento'}
-        footer={
-          <div style={{display:"flex", justifyContent:"flex-end", gap:8}}>
-            <button onClick={()=>setModalOpen(false)} style={{border:"1px solid #d1d5db", padding:"6px 12px", borderRadius:6, background:"white"}}>Cancelar</button>
-            <button onClick={saveForm} style={{background:"#111827", color:"#fff", padding:"6px 12px", borderRadius:6}}>Salvar</button>
+            <Section title="Payload bruto (debug)">
+              <pre className="text-xs bg-slate-900 text-slate-100 p-4 rounded-md overflow-auto">
+                {JSON.stringify(health, null, 2)}
+              </pre>
+            </Section>
           </div>
-        }
-      >
-        <div style={{display:"grid", gap:12, gridTemplateColumns:"1fr 1fr"}}>
-          <Field label="Nome"><input value={form.nome} onChange={e=>setForm(s=>({...s, nome:e.target.value}))} /></Field>
-          <Field label="Transportadora ID"><input value={form.transportadora_id} onChange={e=>setForm(s=>({...s, transportadora_id:e.target.value}))} /></Field>
-          <Field label="Cron"><input value={form.cron} onChange={e=>setForm(s=>({...s, cron:e.target.value}))} placeholder="*/5 * * * *" /></Field>
-          <Field label="Ativo"><select value={form.ativo?"1":"0"} onChange={e=>setForm(s=>({...s, ativo:e.target.value==="1"}))}><option value="1">Sim</option><option value="0">Não</option></select></Field>
-          <Field label="URL"><input value={form.url} onChange={e=>setForm(s=>({...s, url:e.target.value}))} /></Field>
-          <Field label="Método"><select value={form.metodo} onChange={e=>setForm(s=>({...s, metodo:e.target.value}))}><option>POST</option><option>GET</option><option>PUT</option><option>DELETE</option></select></Field>
-          <Field label="Janela (min)"><input type="number" min={1} max={1440} value={form.janela_minutos} onChange={e=>setForm(s=>({...s, janela_minutos:e.target.value}))} /></Field>
-          <div></div>
-          <Field label="Headers (JSON)"><textarea rows={6} value={form.headers} onChange={e=>setForm(s=>({...s, headers:e.target.value}))} /></Field>
-          <Field label="Payload (JSON)"><textarea rows={6} value={form.payload} onChange={e=>setForm(s=>({...s, payload:e.target.value}))} /></Field>
-          <Field label="Metas (JSON)"><textarea rows={6} value={form.metas} onChange={e=>setForm(s=>({...s, metas:e.target.value}))} /></Field>
-        </div>
-      </Modal>
+        )}
 
-      {/* Footer */}
-      <p style={{fontSize:12, color:"#6b7280", marginTop:16}}>
-        Ajuste os endpoints em <code>API</code> se necessário. Necessita proxy do Vite para <code>/api</code> → <code>http://localhost:4000</code>.
-      </p>
+        {tab === "Agendamentos" && (
+          <div className="space-y-6">
+            <Section title="Ações" right={
+              <Button onClick={openCreate} size="sm">
+                Novo
+              </Button>
+            }>
+              <FilterBar onApply={(f)=>{
+                const q = f.q?.toLowerCase?.() || "";
+                setAgendamentos(prev => prev.filter(x => String(x.nome).toLowerCase().includes(q)));
+              }} />
+            </Section>
+
+            <Section title="Lista de Agendamentos" right={
+              <span className="text-xs text-muted-foreground">{agendamentos.length} itens</span>
+            }>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      {["Nome", "Transportadora", "Cron", "Janela", "Status", "Ações"].map(h => (
+                        <th key={h} className="text-left p-3 font-medium">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {agendamentos.length === 0 && (
+                      <tr>
+                        <td className="p-8 text-center text-muted-foreground" colSpan={6}>
+                          Nenhum registro
+                        </td>
+                      </tr>
+                    )}
+                    {agendamentos.map(r => (
+                      <tr key={r.id} className="border-b hover:bg-muted/50 transition-colors">
+                        <td className="p-3 font-semibold">{r.nome}</td>
+                        <td className="p-3">{r.transportadora_id}</td>
+                        <td className="p-3 font-mono text-xs">{r.cron}</td>
+                        <td className="p-3">{r.janela_minutos ?? 5} min</td>
+                        <td className="p-3">
+                          <StatusBadge ok={!!r.ativo}>
+                            {r.ativo? "Ativo":"Inativo"}
+                          </StatusBadge>
+                        </td>
+                        <td className="p-3">
+                          <div className="flex flex-wrap gap-2">
+                            <Button size="sm" variant="outline" onClick={()=>openEdit(r)}>
+                              Editar
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant={r.ativo ? "secondary" : "default"} 
+                              onClick={()=>toggleActive(r)}
+                            >
+                              {r.ativo?"Pausar":"Ativar"}
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={()=>runNow(r.id)}>
+                              Rodar agora
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Section>
+          </div>
+        )}
+
+        {tab === "Execuções" && (
+          <div className="space-y-6">
+            <Section title="Filtros">
+              <FilterBar onApply={()=>{}} />
+            </Section>
+            <Section title="Execuções" right={
+              <span className="text-xs text-muted-foreground">{execucoes.length} itens</span>
+            }>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      {["ID", "Agendamento", "Status", "Início", "Fim", "Trace"].map(h => (
+                        <th key={h} className="text-left p-3 font-medium">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {execucoes.length === 0 && (
+                      <tr>
+                        <td className="p-8 text-center text-muted-foreground" colSpan={6}>
+                          Nenhum registro
+                        </td>
+                      </tr>
+                    )}
+                    {execucoes.map(r => (
+                      <tr key={r.id} className="border-b hover:bg-muted/50 transition-colors">
+                        <td className="p-3 font-mono text-xs">{r.id}</td>
+                        <td className="p-3">{r.agendamento_id}</td>
+                        <td className="p-3">
+                          <StatusBadge ok={!!r.sucesso}>
+                            {r.sucesso?"OK":"FALHA"}
+                          </StatusBadge>
+                        </td>
+                        <td className="p-3 text-xs">{r.inicio || r.created_at}</td>
+                        <td className="p-3 text-xs">{r.fim || r.updated_at}</td>
+                        <td className="p-3 font-mono text-xs">{r.trace_id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Section>
+          </div>
+        )}
+
+        {tab === "Erros" && (
+          <div className="space-y-6">
+            <Section title="Filtros">
+              <FilterBar onApply={()=>{}} />
+            </Section>
+            <Section title="Erros de Integração" right={
+              <span className="text-xs text-muted-foreground">{erros.length} itens</span>
+            }>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      {["Quando", "Agendamento", "Código", "Mensagem", "Trace"].map(h => (
+                        <th key={h} className="text-left p-3 font-medium">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {erros.length === 0 && (
+                      <tr>
+                        <td className="p-8 text-center text-muted-foreground" colSpan={5}>
+                          Nenhum registro
+                        </td>
+                      </tr>
+                    )}
+                    {erros.map(r => (
+                      <tr key={r.id} className="border-b hover:bg-muted/50 transition-colors">
+                        <td className="p-3 text-xs">{r.created_at || r.data}</td>
+                        <td className="p-3">{r.agendamento_id}</td>
+                        <td className="p-3">{r.codigo || r.http_status}</td>
+                        <td className="p-3">
+                          <pre className="m-0 whitespace-pre-wrap text-xs max-w-xs">
+                            {r.mensagem || r.detalhes}
+                          </pre>
+                        </td>
+                        <td className="p-3 font-mono text-xs">{r.trace_id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Section>
+          </div>
+        )}
+
+        {tab === "Arquivos" && (
+          <div className="space-y-6">
+            <Section title="Filtros">
+              <FilterBar onApply={()=>{}} />
+            </Section>
+            <Section title="Arquivos Processados" right={
+              <span className="text-xs text-muted-foreground">{arquivos.length} itens</span>
+            }>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      {["Quando", "Arquivo", "Origem", "Bytes", "Trace"].map(h => (
+                        <th key={h} className="text-left p-3 font-medium">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {arquivos.length === 0 && (
+                      <tr>
+                        <td className="p-8 text-center text-muted-foreground" colSpan={5}>
+                          Nenhum registro
+                        </td>
+                      </tr>
+                    )}
+                    {arquivos.map(r => (
+                      <tr key={r.id} className="border-b hover:bg-muted/50 transition-colors">
+                        <td className="p-3 text-xs">{r.created_at}</td>
+                        <td className="p-3">{r.nome || r.path}</td>
+                        <td className="p-3">{r.origem || r.transportadora_id}</td>
+                        <td className="p-3 text-xs">{r.tamanho || r.bytes}</td>
+                        <td className="p-3 font-mono text-xs">{r.trace_id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Section>
+          </div>
+        )}
+
+        {tab === "Logs" && (
+          <div className="space-y-6">
+            <Section title="Filtros">
+              <FilterBar onApply={()=>{}} />
+            </Section>
+            <Section title="Logs" right={
+              <span className="text-xs text-muted-foreground">{logs.length} itens</span>
+            }>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      {["Quando", "Nível", "Mensagem", "Trace"].map(h => (
+                        <th key={h} className="text-left p-3 font-medium">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {logs.length === 0 && (
+                      <tr>
+                        <td className="p-8 text-center text-muted-foreground" colSpan={4}>
+                          Nenhum registro
+                        </td>
+                      </tr>
+                    )}
+                    {logs.map(r => (
+                      <tr key={r.id || r.timestamp} className="border-b hover:bg-muted/50 transition-colors">
+                        <td className="p-3 text-xs">{r.timestamp || r.created_at}</td>
+                        <td className="p-3">
+                          <Badge variant={r.level === 'error' ? 'destructive' : 'secondary'}>
+                            {r.level || r.nivel}
+                          </Badge>
+                        </td>
+                        <td className="p-3">
+                          <pre className="m-0 whitespace-pre-wrap text-xs max-w-md">
+                            {r.message || r.mensagem}
+                          </pre>
+                        </td>
+                        <td className="p-3 font-mono text-xs">{r.trace_id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Section>
+          </div>
+        )}
+
+        {/* Modal de criar/editar */}
+        <Modal 
+          open={modalOpen} 
+          onClose={()=>setModalOpen(false)} 
+          title={editing? 'Editar agendamento' : 'Novo agendamento'}
+          footer={
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={()=>setModalOpen(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={saveForm}>
+                Salvar
+              </Button>
+            </div>
+          }
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Nome">
+              <Input 
+                value={form.nome} 
+                onChange={e=>setForm(s=>({...s, nome:e.target.value}))} 
+              />
+            </Field>
+            <Field label="Transportadora ID">
+              <Input 
+                value={form.transportadora_id} 
+                onChange={e=>setForm(s=>({...s, transportadora_id:e.target.value}))} 
+              />
+            </Field>
+            <Field label="Cron">
+              <Input 
+                value={form.cron} 
+                onChange={e=>setForm(s=>({...s, cron:e.target.value}))} 
+                placeholder="*/5 * * * *" 
+              />
+            </Field>
+            <Field label="Ativo">
+              <Select value={form.ativo?"1":"0"} onValueChange={v=>setForm(s=>({...s, ativo:v==="1"}))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Sim</SelectItem>
+                  <SelectItem value="0">Não</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="URL">
+              <Input 
+                value={form.url} 
+                onChange={e=>setForm(s=>({...s, url:e.target.value}))} 
+              />
+            </Field>
+            <Field label="Método">
+              <Select value={form.metodo} onValueChange={v=>setForm(s=>({...s, metodo:v}))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="POST">POST</SelectItem>
+                  <SelectItem value="GET">GET</SelectItem>
+                  <SelectItem value="PUT">PUT</SelectItem>
+                  <SelectItem value="DELETE">DELETE</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Janela (min)">
+              <Input 
+                type="number" 
+                min={1} 
+                max={1440} 
+                value={form.janela_minutos} 
+                onChange={e=>setForm(s=>({...s, janela_minutos:e.target.value}))} 
+              />
+            </Field>
+            <div></div>
+            <Field label="Headers (JSON)">
+              <Textarea 
+                rows={6} 
+                value={form.headers} 
+                onChange={e=>setForm(s=>({...s, headers:e.target.value}))} 
+              />
+            </Field>
+            <Field label="Payload (JSON)">
+              <Textarea 
+                rows={6} 
+                value={form.payload} 
+                onChange={e=>setForm(s=>({...s, payload:e.target.value}))} 
+              />
+            </Field>
+            <Field label="Metas (JSON)">
+              <Textarea 
+                rows={6} 
+                value={form.metas} 
+                onChange={e=>setForm(s=>({...s, metas:e.target.value}))} 
+              />
+            </Field>
+          </div>
+        </Modal>
+
+        {/* Footer */}
+        <div className="text-xs text-muted-foreground mt-8 text-center">
+          Ajuste os endpoints em <code className="bg-muted px-1 rounded">API</code> se necessário. 
+          Necessita proxy do Vite para <code className="bg-muted px-1 rounded">/api</code> → <code className="bg-muted px-1 rounded">http://localhost:4000</code>.
+        </div>
+      </div>
     </div>
   );
 }
