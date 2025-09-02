@@ -97,6 +97,7 @@
     "helmet": "*"
   },
   "scripts": {
+    "build:dev": "vite build --mode development"
     "client:start": "vite",
     "client:dev": "vite",
     "client:build": "vite build",
