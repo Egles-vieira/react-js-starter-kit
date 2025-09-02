@@ -1,0 +1,30 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\web\\teste\\react-js-4\\logs\\.10dfda63b7742a441fbc3244445b2fabfdccbc73-audit.json",
+    "files": [
+        {
+            "date": 1756515159522,
+            "name": "C:\\web\\teste\\react-js-4\\logs\\app-2025-08-29.log",
+            "hash": "866b7e0fd3733bd23711e4bea23d78214722f61d616c9106aee8059fc3958b9f"
+        },
+        {
+            "date": 1756523364002,
+            "name": "C:\\web\\teste\\react-js-4\\logs\\app-2025-08-30.log",
+            "hash": "fbe81d8d6c331b04c6de7bd1c8882f5dc89da92fff84ba95d6b204a9eecbe9a9"
+        },
+        {
+            "date": 1756733676805,
+            "name": "C:\\web\\teste\\react-js-4\\logs\\app-2025-09-01.log",
+            "hash": "087dcd9ae8df78847db0b49f49e59bee88b537fb574ebe98d377ce5c9021f941"
+        },
+        {
+            "date": 1756815944476,
+            "name": "C:\\web\\teste\\react-js-4\\logs\\app-2025-09-02.log",
+            "hash": "cb8ea183c96696f00ac0bc082bd080878d576be2a9987e9ba43b618490ddddc6"
+        }
+    ],
+    "hashType": "sha256"
+}
