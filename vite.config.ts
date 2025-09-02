@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => ({
       '/api-mobile': { target: 'http://localhost:4000', changeOrigin: true },
       '/api-ext': { target: 'http://localhost:4000', changeOrigin: true },
     },
+    allowedHosts: ['8080-ild470q5x62hn7ul4ituv-738fbf52.manusvm.computer'],
   },
 
   build: { sourcemap: true, outDir: 'dist' },

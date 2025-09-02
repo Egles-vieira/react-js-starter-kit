@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/ubuntu/react-js-starter-kit/logs/.813818ea588f95ea0495a926eb34830a991c141e-audit.json",
+    "files": [
+        {
+            "date": 1756834532626,
+            "name": "/home/ubuntu/react-js-starter-kit/logs/app-2025-09-02.log",
+            "hash": "89759fe5fd3fccb26dad1badf031defcc5d78fd5b4920340d15f5f0bc5995b5f"
+        }
+    ],
+    "hashType": "sha256"
+}

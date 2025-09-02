@@ -32,3 +32,28 @@ All pages are currently public; authentication hooks can be added in the
 future.
 
 
+
+
+
+## Job Scheduling
+
+The project now includes a robust job scheduling system powered by Bull and Redis. This system allows for background processing of tasks, such as sending notifications, generating reports, and more.
+
+### Features
+
+- **Persistent Job Queues:** Jobs are stored in Redis, ensuring they are not lost if the application restarts.
+- **Automatic Retries:** Failed jobs are automatically retried with an exponential backoff strategy.
+- **Concurrency Control:** The number of jobs processed simultaneously is limited to prevent system overload.
+- **Real-time Monitoring:** The status of the job queue can be monitored in real-time via an API endpoint.
+- **Manual Execution:** Jobs can be triggered manually via an API endpoint for on-demand execution.
+
+### Monitoring
+
+- **Queue Stats:** `GET /api/cron/queue/stats`
+- **Job History:** `GET /api/cron/jobs`
+
+### Manual Execution
+
+- **Run Job:** `POST /api/cron/agendamentos/:id/run`
+
+
