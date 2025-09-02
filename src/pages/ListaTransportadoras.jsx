@@ -30,16 +30,35 @@ export default function ListaTransportadoras() {
   const [editando, setEditando] = useState(false);
   const [selecionado, setSelecionado] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const carregar = () => {
-    fetch(`${API_URL}/api/transportadoras`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+  const carregar = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_URL}/api/transportadoras`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Ensure we always set an array
+        setTransportadoras(Array.isArray(data) ? data : []);
+      } else {
+        setError(data.error || 'Erro ao carregar transportadoras');
+        setTransportadoras([]);
       }
-    })
-      .then(r => r.json())
-      .then(setTransportadoras)
-      .catch(console.error);
+    } catch (err) {
+      console.error('Erro ao carregar transportadoras:', err);
+      setError('Erro de conexão com o servidor');
+      setTransportadoras([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { carregar(); }, []);
@@ -122,6 +141,29 @@ export default function ListaTransportadoras() {
         </div>
       )}
 
+      {error && (
+        <div style={{ 
+          backgroundColor: '#fee', 
+          border: '1px solid #fcc', 
+          color: '#c00', 
+          padding: 12, 
+          borderRadius: 6, 
+          marginBottom: 20 
+        }}>
+          {error}
+        </div>
+      )}
+
+      {loading && (
+        <div style={{ 
+          textAlign: 'center', 
+          padding: 20, 
+          color: '#666' 
+        }}>
+          Carregando transportadoras...
+        </div>
+      )}
+
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
         <thead style={{
           position: 'sticky',
@@ -188,7 +230,7 @@ export default function ListaTransportadoras() {
               </td>
             </tr>
           ))}
-          {transportadoras.length === 0 && (
+          {!loading && transportadoras.length === 0 && !error && (
             <tr>
               <td colSpan={12} style={{ padding: 16, textAlign: 'center', color: '#888' }}>
                 Nenhuma transportadora encontrada.
