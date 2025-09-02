@@ -79,6 +79,8 @@ if (process.env.NODE_ENV === 'test') {
   router.use('/arquivos', arquivos);
   router.use('/erros', erros);
   router.use('/webhooks', webhooks);
+  router.use('/cron', require('./cron.health.routes'));
+  router.use('/logs', require('./logs.routes'));
 }
 
 module.exports = router;

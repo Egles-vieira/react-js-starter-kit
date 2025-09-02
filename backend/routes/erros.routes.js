@@ -4,7 +4,7 @@ const router = express.Router();
 
 // GET /api/erros
 router.get('/', (req, res) => {
-  res.json({ erros: [] });
+  res.json([]);
 });
 
 module.exports = router;

@@ -20,6 +20,11 @@ router.post(
   }
 );
 
+// GET /api/jobs - lista execuções
+router.get('/', (req, res) => {
+  res.json(execucoes);
+});
+
 // GET /api/jobs/execucoes
 router.get('/execucoes', (req, res) => {
   res.json(execucoes);
