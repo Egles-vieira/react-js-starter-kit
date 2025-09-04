@@ -6,7 +6,6 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SidebarProvider } from './contexts/SidebarContext.jsx';
 
-
 import Layout from './components/Layout.jsx';
 import Cadastro from './pages/Cadastro';
 import Monitoramento from './pages/Monitoramento';
@@ -31,12 +30,11 @@ import Agendamentos from './pages/Agendamentos.jsx';
 import Execucoes from './pages/Execucoes.jsx';
 import ArquivosProcessados from './pages/ArquivosProcessados.jsx';
 import Erros from './pages/Erros.jsx';
-
-import AdminSchedulerSuite from '@/pages/AdminSchedulerSuite';
+import AdminSchedulerSuite from './pages/AdminSchedulerSuite';
 import GestaoOcorrencias from './pages/GestaoOcorrenciasSimples';
 import DashboardEntregas from './pages/DashboardEntregasSimples';
 import RastreamentoEntregas from './pages/RastreamentoEntregas';
-
+import Index from './pages/Index.jsx';
 
 // Placeholder for future authentication integration. For now all routes are
 // accessible without checking credentials.
@@ -53,6 +51,7 @@ export default function App() {
       >
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<RotaProtegida><Layout><Dashboard /></Layout></RotaProtegida>} />
             <Route path="/monitoramento" element={<RotaProtegida><Layout><Monitoramento /></Layout></RotaProtegida>} />
@@ -76,18 +75,10 @@ export default function App() {
             <Route path="/execucoes" element={<RotaProtegida><Layout><Execucoes /></Layout></RotaProtegida>} />
             <Route path="/arquivos-processados" element={<RotaProtegida><Layout><ArquivosProcessados /></Layout></RotaProtegida>} />
             <Route path="/erros" element={<RotaProtegida><Layout><Erros /></Layout></RotaProtegida>} />
-
             <Route path="/AdminSchedulerSuite" element={<RotaProtegida><Layout><AdminSchedulerSuite /></Layout></RotaProtegida>} />
             <Route path="/gestao-ocorrencias" element={<RotaProtegida><Layout><GestaoOcorrencias /></Layout></RotaProtegida>} />
             <Route path="/dashboard-entregas" element={<RotaProtegida><Layout><DashboardEntregas /></Layout></RotaProtegida>} />
             <Route path="/rastreamento-entregas" element={<RotaProtegida><Layout><RastreamentoEntregas /></Layout></RotaProtegida>} />
-            
-            
-            <Route path="*" element={
-              <RotaProtegida>
-                <Navigate to="/dashboard" replace />
-              </RotaProtegida>
-            } />
           </Routes>
           <ToastContainer autoClose={3000} position="top-right" />
         </BrowserRouter>
