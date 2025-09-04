@@ -33,6 +33,9 @@ import ArquivosProcessados from './pages/ArquivosProcessados.jsx';
 import Erros from './pages/Erros.jsx';
 
 import AdminSchedulerSuite from '@/pages/AdminSchedulerSuite';
+import CodigoOcorrenciasAdmin from './pages/CodigoOcorrenciasAdmin';
+import TransportadoraCodigoOcorrenciaAdmin from './pages/TransportadoraCodigoOcorrenciaAdmin';
+import OcorrenciasView from './pages/OcorrenciasView';
 
 
 // Placeholder for future authentication integration. For now all routes are
@@ -75,6 +78,10 @@ export default function App() {
             <Route path="/erros" element={<RotaProtegida><Layout><Erros /></Layout></RotaProtegida>} />
 
             <Route path="/AdminSchedulerSuite" element={<RotaProtegida><Layout><AdminSchedulerSuite /></Layout></RotaProtegida>} />
+            
+            <Route path="/admin/codigo-ocorrencias" element={<RotaProtegida><Layout><CodigoOcorrenciasAdmin /></Layout></RotaProtegida>} />
+            <Route path="/admin/transportadora-codigo-ocorrencia" element={<RotaProtegida><Layout><TransportadoraCodigoOcorrenciaAdmin /></Layout></RotaProtegida>} />
+            <Route path="/ocorrencias" element={<RotaProtegida><Layout><OcorrenciasView /></Layout></RotaProtegida>} />
             
             
             <Route path="*" element={
