@@ -1,0 +1,704 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/agendamentos": {
+      "get": {
+        "summary": "Lista todos os agendamentos",
+        "tags": [
+          "Agendamentos"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de agendamentos retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "ID do agendamento"
+                      },
+                      "nome": {
+                        "type": "string",
+                        "description": "Nome do agendamento"
+                      },
+                      "cron": {
+                        "type": "string",
+                        "description": "Expressão CRON do agendamento"
+                      },
+                      "ativo": {
+                        "type": "boolean",
+                        "description": "Status de ativação do agendamento"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data de criação"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data da última atualização"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      },
+      "post": {
+        "summary": "Cria um novo agendamento",
+        "tags": [
+          "Agendamentos"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "nome",
+                  "cron"
+                ],
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "description": "Nome do agendamento"
+                  },
+                  "cron": {
+                    "type": "string",
+                    "description": "Expressão CRON do agendamento"
+                  },
+                  "transportadora_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "ID da transportadora associada (opcional)"
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "URL para o agendamento (opcional)"
+                  },
+                  "metodo": {
+                    "type": "string",
+                    "enum": [
+                      "GET",
+                      "POST",
+                      "PUT",
+                      "PATCH",
+                      "DELETE"
+                    ],
+                    "default": "POST",
+                    "description": "Método HTTP para o agendamento"
+                  },
+                  "janela_minutos": {
+                    "type": "integer",
+                    "description": "Janela de minutos para execução (opcional)"
+                  },
+                  "ativo": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Status de ativação do agendamento"
+                  },
+                  "headers": {
+                    "type": "object",
+                    "description": "Cabeçalhos da requisição (opcional)"
+                  },
+                  "payload": {
+                    "type": "object",
+                    "description": "Payload da requisição (opcional)"
+                  },
+                  "metas": {
+                    "type": "object",
+                    "description": "Metadados adicionais (opcional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Agendamento criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID do agendamento"
+                    },
+                    "nome": {
+                      "type": "string",
+                      "description": "Nome do agendamento"
+                    },
+                    "cron": {
+                      "type": "string",
+                      "description": "Expressão CRON do agendamento"
+                    },
+                    "ativo": {
+                      "type": "boolean",
+                      "description": "Status de ativação do agendamento"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Data de criação"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Data da última atualização"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Expressão CRON inválida ou dados inválidos"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/agendamentos/{id}": {
+      "get": {
+        "summary": "Retorna um agendamento específico por ID",
+        "tags": [
+          "Agendamentos"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "description": "ID do agendamento"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agendamento retornado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID do agendamento"
+                    },
+                    "nome": {
+                      "type": "string",
+                      "description": "Nome do agendamento"
+                    },
+                    "cron": {
+                      "type": "string",
+                      "description": "Expressão CRON do agendamento"
+                    },
+                    "ativo": {
+                      "type": "boolean",
+                      "description": "Status de ativação do agendamento"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Data de criação"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Data da última atualização"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Agendamento não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualiza um agendamento existente",
+        "tags": [
+          "Agendamentos"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "description": "ID do agendamento a ser atualizado"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "nome",
+                  "cron"
+                ],
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "description": "Nome do agendamento"
+                  },
+                  "cron": {
+                    "type": "string",
+                    "description": "Expressão CRON do agendamento"
+                  },
+                  "transportadora_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "ID da transportadora associada (opcional)"
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "URL para o agendamento (opcional)"
+                  },
+                  "metodo": {
+                    "type": "string",
+                    "enum": [
+                      "GET",
+                      "POST",
+                      "PUT",
+                      "PATCH",
+                      "DELETE"
+                    ],
+                    "default": "POST",
+                    "description": "Método HTTP para o agendamento"
+                  },
+                  "janela_minutos": {
+                    "type": "integer",
+                    "description": "Janela de minutos para execução (opcional)"
+                  },
+                  "ativo": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Status de ativação do agendamento"
+                  },
+                  "headers": {
+                    "type": "object",
+                    "description": "Cabeçalhos da requisição (opcional)"
+                  },
+                  "payload": {
+                    "type": "object",
+                    "description": "Payload da requisição (opcional)"
+                  },
+                  "metas": {
+                    "type": "object",
+                    "description": "Metadados adicionais (opcional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agendamento atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID do agendamento"
+                    },
+                    "nome": {
+                      "type": "string",
+                      "description": "Nome do agendamento"
+                    },
+                    "cron": {
+                      "type": "string",
+                      "description": "Expressão CRON do agendamento"
+                    },
+                    "ativo": {
+                      "type": "boolean",
+                      "description": "Status de ativação do agendamento"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Data de criação"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Data da última atualização"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Expressão CRON inválida ou dados inválidos"
+          },
+          "404": {
+            "description": "Agendamento não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deleta um agendamento por ID",
+        "tags": [
+          "Agendamentos"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "description": "ID do agendamento a ser deletado"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Agendamento deletado com sucesso"
+          },
+          "404": {
+            "description": "Agendamento não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/agendamentos/{id}/status": {
+      "patch": {
+        "summary": "Atualiza o status de ativação de um agendamento",
+        "tags": [
+          "Agendamentos"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "description": "ID do agendamento a ser atualizado"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ativo"
+                ],
+                "properties": {
+                  "ativo": {
+                    "type": "boolean",
+                    "description": "Novo status de ativação (true para ativo, false para inativo)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status do agendamento atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID do agendamento"
+                    },
+                    "nome": {
+                      "type": "string",
+                      "description": "Nome do agendamento"
+                    },
+                    "ativo": {
+                      "type": "boolean",
+                      "description": "Status de ativação atualizado"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Agendamento não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/agendamentos/{id}/run": {
+      "post": {
+        "summary": "Executa um agendamento manualmente",
+        "tags": [
+          "Agendamentos"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "description": "ID do agendamento a ser executado"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Agendamento executado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Job executado com sucesso"
+                    },
+                    "agendamento_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID do agendamento executado"
+                    },
+                    "executed_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Timestamp da execução"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Agendamento não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/integracoes": {
+      "get": {
+        "summary": "Lista todas as integrações",
+        "tags": [
+          "Integrações"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "slug",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtra integrações por slug (tipo)"
+          },
+          {
+            "in": "query",
+            "name": "ativo",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filtra integrações por status de ativação"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de integrações retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "ID da integração"
+                      },
+                      "tipo": {
+                        "type": "string",
+                        "description": "Tipo da integração (slug)"
+                      },
+                      "config": {
+                        "type": "object",
+                        "description": "Configurações da integração"
+                      },
+                      "ativo": {
+                        "type": "boolean",
+                        "description": "Status de ativação"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/integracoes/teste-conexao": {
+      "post": {
+        "summary": "Testa a conexão com uma URL de integração",
+        "tags": [
+          "Integrações"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL para testar a conexão"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conexão de teste bem-sucedida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sucesso": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "url": {
+                      "type": "string",
+                      "example": "\\'https://example.com/api\\'"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "\\'Conexão de teste bem-sucedida.\\'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/test": {
+      "get": {
+        "summary": "Retorna uma mensagem de teste",
+        "tags": [
+          "Test"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "API de teste funcionando!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {},
+  "tags": [
+    {
+      "name": "Agendamentos",
+      "description": "Gerenciamento de agendamentos de jobs"
+    },
+    {
+      "name": "Integrações",
+      "description": "Gerenciamento de integrações com sistemas externos"
+    },
+    {
+      "name": "Test",
+      "description": "Endpoints de Teste"
+    },
+    {
+      "name": "Webhooks",
+      "description": "Recebimento e processamento de webhooks de transportadoras"
+    }
+  ]
+}

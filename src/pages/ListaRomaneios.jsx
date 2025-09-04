@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import FormularioRomaneio from '../components/FormularioRomaneio';
 
 const modalStyle = {
   backdrop: {
@@ -36,9 +37,25 @@ export default function ListaRomaneios() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-      .then(r => r.json())
-      .then(setRomaneios)
-      .catch(console.error);
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Ensure data is always an array
+        if (Array.isArray(data)) {
+          setRomaneios(data);
+        } else {
+          console.error('API did not return an array:', data);
+          setRomaneios([]);
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao carregar romaneios:', error);
+        setRomaneios([]); // Set empty array on error
+      });
   };
 
   useEffect(() => { carregar(); }, []);

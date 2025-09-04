@@ -6,7 +6,6 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { SidebarProvider } from './contexts/SidebarContext.jsx';
 
-
 import Layout from './components/Layout.jsx';
 import Cadastro from './pages/Cadastro';
 import Monitoramento from './pages/Monitoramento';
@@ -32,10 +31,12 @@ import Execucoes from './pages/Execucoes.jsx';
 import ArquivosProcessados from './pages/ArquivosProcessados.jsx';
 import Erros from './pages/Erros.jsx';
 
+
 import AdminSchedulerSuite from '@/pages/AdminSchedulerSuite';
 import CodigoOcorrenciasAdmin from './pages/CodigoOcorrenciasAdmin';
 import TransportadoraCodigoOcorrenciaAdmin from './pages/TransportadoraCodigoOcorrenciaAdmin';
 import OcorrenciasView from './pages/OcorrenciasView';
+
 
 
 // Placeholder for future authentication integration. For now all routes are
@@ -53,6 +54,7 @@ export default function App() {
       >
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<RotaProtegida><Layout><Dashboard /></Layout></RotaProtegida>} />
             <Route path="/monitoramento" element={<RotaProtegida><Layout><Monitoramento /></Layout></RotaProtegida>} />
@@ -76,7 +78,6 @@ export default function App() {
             <Route path="/execucoes" element={<RotaProtegida><Layout><Execucoes /></Layout></RotaProtegida>} />
             <Route path="/arquivos-processados" element={<RotaProtegida><Layout><ArquivosProcessados /></Layout></RotaProtegida>} />
             <Route path="/erros" element={<RotaProtegida><Layout><Erros /></Layout></RotaProtegida>} />
-
             <Route path="/AdminSchedulerSuite" element={<RotaProtegida><Layout><AdminSchedulerSuite /></Layout></RotaProtegida>} />
             
             <Route path="/admin/codigo-ocorrencias" element={<RotaProtegida><Layout><CodigoOcorrenciasAdmin /></Layout></RotaProtegida>} />
@@ -89,6 +90,7 @@ export default function App() {
                 <Navigate to="/dashboard" replace />
               </RotaProtegida>
             } />
+
           </Routes>
           <ToastContainer autoClose={3000} position="top-right" />
         </BrowserRouter>

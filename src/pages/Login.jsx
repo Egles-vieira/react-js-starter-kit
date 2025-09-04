@@ -111,7 +111,6 @@ export default function Login() {
                 borderRadius: 6,
                 border: '1px solid #ccc',
                 fontSize: 14,
-                border: '1px solid #ccc',
                 outline: 'none',
               }}
                 onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #00bfff'}
@@ -132,7 +131,6 @@ export default function Login() {
                 borderRadius: 6,
                 border: '1px solid #ccc',
                 fontSize: 14,
-                border: '1px solid #ccc',
                 outline: 'none',
               }}
                 onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #00bfff'}
