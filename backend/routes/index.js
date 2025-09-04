@@ -43,6 +43,9 @@ if (process.env.NODE_ENV === 'test') {
 
   const integracoes = require('./integracoes.routes');
   const agendamentos = require('./agendamentos.routes');
+  const dashboard = require('./dashboard.routes');
+  const ocorrencias = require('./ocorrencias.routes');
+  const rastreamento = require('./rastreamento.routes');
   let jobs;
   if (process.env.NODE_ENV !== 'test') {
     jobs = require('./jobs.routes');
@@ -73,6 +76,9 @@ if (process.env.NODE_ENV === 'test') {
 
   router.use('/integracoes', integracoes);
   router.use('/agendamentos', require('./agendamentos.routes'));
+  router.use('/dashboard', dashboard);
+  router.use('/ocorrencias', ocorrencias);
+  router.use('/rastreamento', rastreamento);
   if (jobs) {
     router.use('/jobs', jobs);
   }
