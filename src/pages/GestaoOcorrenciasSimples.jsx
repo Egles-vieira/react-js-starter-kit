@@ -204,19 +204,6 @@ export default function GestaoOcorrenciasSimples() {
     return new Date(data).toLocaleString('pt-BR');
   };
 
-  const handleFiltroChange = (campo, valor) => {
-    setFiltros(prev => ({ ...prev, [campo]: valor }));
-  };
-
-  const limparFiltros = () => {
-    setFiltros({
-      busca: '',
-      tipo: '',
-      dataInicio: '',
-      dataFim: ''
-    });
-  };
-
   const ocorrenciasFiltradas = ocorrencias.filter(ocorrencia => {
     if (filtros.busca && !ocorrencia.numero_nota_fiscal.toLowerCase().includes(filtros.busca.toLowerCase()) &&
         !ocorrencia.destinatario.toLowerCase().includes(filtros.busca.toLowerCase())) {
