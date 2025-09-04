@@ -87,6 +87,11 @@ if (process.env.NODE_ENV === 'test') {
   router.use('/webhooks', webhooks);
   router.use('/cron', require('./cron.health.routes'));
   router.use('/logs', require('./logs.routes'));
+  
+  router.use('/cadastros/admin/codigo-ocorrencias', require('./codigo-ocorrencias.routes'));
+  router.use('/cadastros/admin/transportadora-codigo-ocorrencia', require('./transportadora-codigo-ocorrencia.routes'));
+  router.use('/ocorrencias', require('./ocorrencias.routes'));
+  router.use('/notas', require('./notas-enhanced.routes'));
 }
 
 module.exports = router;

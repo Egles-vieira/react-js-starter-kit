@@ -98,6 +98,11 @@ async function processAgendamento(job) {
       response_size: JSON.stringify(response.data).length
     });
 
+    let processedOccurrences = 0;
+    if (response.data && transportadoraId) {
+      processedOccurrences = await processTransporterResponse(response.data, transportadoraId, traceId);
+    }
+
     // Atualizar status da execução para sucesso (apenas se não for teste)
     if (agendamentoId !== 'test-123' && execucaoId) {
       await pool.query(`
@@ -111,7 +116,8 @@ async function processAgendamento(job) {
           duration_ms: duration,
           response_headers: response.headers,
           response_data: response.data,
-          trace_id: traceId
+          trace_id: traceId,
+          processed_occurrences: processedOccurrences
         }), 
         execucaoId
       ]);
@@ -152,6 +158,114 @@ async function processAgendamento(job) {
     // Re-lançar o erro para que o Bull possa lidar com retries
     throw error;
   }
+}
+
+async function processTransporterResponse(responseData, transportadoraId, traceId) {
+  const ocorrenciasRepo = require('../repositories/ocorrencias.repo');
+  const transportadoraCodigoRepo = require('../repositories/transportadora-codigo-ocorrencia.repo');
+  const errosRepo = require('../repositories/errors.repo');
+  
+  logger.info(`[worker] Processando resposta da transportadora`, {
+    trace_id: traceId,
+    transportadora_id: transportadoraId,
+    records_count: Array.isArray(responseData) ? responseData.length : 1
+  });
+
+  const records = Array.isArray(responseData) ? responseData : [responseData];
+  let processedCount = 0;
+  
+  for (const record of records) {
+    try {
+      const { chave_nf, codigo_externo, descricao, data_ocorrencia } = extractOccurrenceData(record);
+      
+      if (!chave_nf || !codigo_externo) {
+        logger.warn(`[worker] Dados insuficientes para processar ocorrência`, {
+          trace_id: traceId,
+          record
+        });
+        continue;
+      }
+
+      const notaFiscal = await pool.query(
+        'SELECT id FROM notas_fiscais WHERE chave_nf = $1',
+        [chave_nf]
+      );
+
+      if (notaFiscal.rows.length === 0) {
+        logger.warn(`[worker] Nota fiscal não encontrada`, {
+          trace_id: traceId,
+          chave_nf
+        });
+        continue;
+      }
+
+      const notaFiscalId = notaFiscal.rows[0].id;
+
+      const mapeamento = await transportadoraCodigoRepo.getByTransportadoraAndCodigo(
+        transportadoraId, 
+        codigo_externo
+      );
+
+      let statusNormalizado = 'unknown';
+      let codigoOcorrenciaId = null;
+
+      if (mapeamento) {
+        statusNormalizado = mapeamento.status_normalizado;
+        codigoOcorrenciaId = mapeamento.codigo_ocorrencia_id;
+      } else {
+        await errosRepo.create({
+          integracao_id: null,
+          codigo: 'MAPEAMENTO_INEXISTENTE',
+          mensagem: `Código externo não mapeado: ${codigo_externo}`,
+          detalhe: {
+            transportadora_id: transportadoraId,
+            codigo_externo,
+            trace_id: traceId
+          }
+        });
+      }
+
+      await ocorrenciasRepo.create({
+        nota_fiscal_id: notaFiscalId,
+        transportadora_id: transportadoraId,
+        codigo_externo,
+        codigo_ocorrencia_id: codigoOcorrenciaId,
+        status_normalizado: statusNormalizado,
+        descricao,
+        data_ocorrencia: data_ocorrencia ? new Date(data_ocorrencia) : new Date(),
+        dados_originais: record
+      });
+
+      await ocorrenciasRepo.updateNotaFiscalStatus(notaFiscalId);
+
+      processedCount++;
+
+      logger.info(`[worker] Ocorrência processada`, {
+        trace_id: traceId,
+        nota_fiscal_id: notaFiscalId,
+        codigo_externo,
+        status_normalizado
+      });
+
+    } catch (error) {
+      logger.error(`[worker] Erro ao processar ocorrência`, {
+        trace_id: traceId,
+        error: error.message,
+        record
+      });
+    }
+  }
+  
+  return processedCount;
+}
+
+function extractOccurrenceData(record) {
+  return {
+    chave_nf: record.chave_nf || record.nf_key || record.invoice_key,
+    codigo_externo: record.codigo || record.status_code || record.event_code,
+    descricao: record.descricao || record.description || record.message,
+    data_ocorrencia: record.data_ocorrencia || record.event_date || record.timestamp
+  };
 }
 
 module.exports = { processAgendamento };
