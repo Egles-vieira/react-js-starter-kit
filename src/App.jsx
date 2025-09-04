@@ -30,7 +30,7 @@ import Agendamentos from './pages/Agendamentos.jsx';
 import Execucoes from './pages/Execucoes.jsx';
 import ArquivosProcessados from './pages/ArquivosProcessados.jsx';
 import Erros from './pages/Erros.jsx';
-import Index from './pages/Index.jsx';
+import Index from './pages/Index.jsx'; // Landing page component
 
 import AdminSchedulerSuite from '@/pages/AdminSchedulerSuite';
 import CodigoOcorrenciasAdmin from './pages/CodigoOcorrenciasAdmin';
