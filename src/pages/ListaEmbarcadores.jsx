@@ -39,8 +39,19 @@ export default function Embarcadores() {
       }
     })
       .then(r => r.json())
-      .then(setEmbarcadores)
-      .catch(console.error);
+      .then(data => {
+        // Ensure we always set an array
+        if (Array.isArray(data)) {
+          setEmbarcadores(data);
+        } else {
+          console.error('API response is not an array:', data);
+          setEmbarcadores([]);
+        }
+      })
+      .catch(err => {
+        console.error('Error loading embarcadores:', err);
+        setEmbarcadores([]);
+      });
   };
 
   useEffect(() => {
