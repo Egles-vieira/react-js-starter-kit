@@ -33,6 +33,9 @@ import ArquivosProcessados from './pages/ArquivosProcessados.jsx';
 import Erros from './pages/Erros.jsx';
 
 import AdminSchedulerSuite from '@/pages/AdminSchedulerSuite';
+import GestaoOcorrencias from './pages/GestaoOcorrenciasSimples';
+import DashboardEntregas from './pages/DashboardEntregasSimples';
+import RastreamentoEntregas from './pages/RastreamentoEntregas';
 
 
 // Placeholder for future authentication integration. For now all routes are
@@ -75,6 +78,9 @@ export default function App() {
             <Route path="/erros" element={<RotaProtegida><Layout><Erros /></Layout></RotaProtegida>} />
 
             <Route path="/AdminSchedulerSuite" element={<RotaProtegida><Layout><AdminSchedulerSuite /></Layout></RotaProtegida>} />
+            <Route path="/gestao-ocorrencias" element={<RotaProtegida><Layout><GestaoOcorrencias /></Layout></RotaProtegida>} />
+            <Route path="/dashboard-entregas" element={<RotaProtegida><Layout><DashboardEntregas /></Layout></RotaProtegida>} />
+            <Route path="/rastreamento-entregas" element={<RotaProtegida><Layout><RastreamentoEntregas /></Layout></RotaProtegida>} />
             
             
             <Route path="*" element={

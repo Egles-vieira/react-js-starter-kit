@@ -55,7 +55,9 @@ const menuSections = [
         name: 'Entregas',
         icon: <FiPackage />,
         children: [
-          { name: 'Entregas em geral', to: '/emmanutencao', icon: <FiClipboard /> },
+          { name: 'Dashboard Entregas', to: '/dashboard-entregas', icon: <FiBarChart2 /> },
+          { name: 'Rastreamento', to: '/rastreamento-entregas', icon: <FiMapPin /> },
+          { name: 'Gestão Ocorrências', to: '/gestao-ocorrencias', icon: <FiActivity /> },
           { name: 'Notas fiscais', to: '/listanotasfiscais', icon: <FiDownloadCloud /> },
           { name: 'Romaneios', to: '/romaneios', icon: <FiGitPullRequest /> }
         ]
